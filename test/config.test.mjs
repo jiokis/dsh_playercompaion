@@ -9,11 +9,14 @@ test('resolveConfig fills defaults', () => {
   assert.equal(config.regions.genshin.w, 0.84)
   assert.equal(config.wiki.sources.hsr.api, 'https://wiki.biligame.com/sr/api.php')
   assert.equal(config.narrate.defaultStyle, '陪玩解说')
+  assert.equal(config.watch.enabled, true)
+  assert.equal(config.watch.intervalSec, 8)
 })
 
 test('resolveConfig deep-merges overrides', () => {
-  const config = resolveConfig({ capture: { occlusionThreshold: 0.5 }, wiki: { enabled: false } })
+  const config = resolveConfig({ capture: { occlusionThreshold: 0.5 }, wiki: { enabled: false }, watch: { intervalSec: 1 } })
   assert.equal(config.capture.occlusionThreshold, 0.5)
+  assert.equal(config.watch.intervalSec, 2)
   assert.equal(config.capture.settleMs, 350)
   assert.equal(config.wiki.enabled, false)
 })
@@ -36,5 +39,6 @@ test('schemastery Config validates and fills defaults', () => {
   assert.equal(plain.wiki.enabled, true)
   assert.equal(plain.vision.maxFindings, DEFAULTS.vision.maxFindings)
   assert.equal(plain.frames.enabled, false)
+  assert.equal(plain.watch.enabled, true)
   assert.equal(typeof value.get, 'function')
 })

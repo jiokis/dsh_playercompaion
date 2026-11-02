@@ -74,7 +74,7 @@ window.__ModuleLoader__.load({
     var zh = {
       title: "旅途记录仪",
       subtitle: "只读 · 原神 / 星铁 · 抓屏 OCR · 本地日志 · 游戏内悬浮窗",
-      tools: "工具：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay",
+      tools: "工具：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch",
       intro: "保存后请重启 DSH 生效；本页只改配置，不写日志、不抓屏。",
       save: "保存",
       reset: "恢复默认",
@@ -97,7 +97,7 @@ window.__ModuleLoader__.load({
     var en = {
       title: "Lore Companion",
       subtitle: "Read-only Genshin / Star Rail capture, OCR, local log and in-game overlay",
-      tools: "Tools: lore_status / lore_capture / lore_query / lore_narrate / lore_overlay",
+      tools: "Tools: lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch",
       intro: "Saving persists the row config. Restart DSH to apply; this page never captures or writes logs.",
       save: "Save",
       reset: "Reset",
@@ -155,6 +155,8 @@ window.__ModuleLoader__.load({
       { path: ["frames", "saveVision"], label: "视觉分析时保存帧", labelEn: "Save frame on vision", type: "checkbox", group: "frames" },
       { path: ["frames", "maxFrames"], label: "最多保留帧数", labelEn: "Max frames", type: "number", group: "frames", step: 10 },
       { path: ["frames", "retentionDays"], label: "保留天数", labelEn: "Retention days", type: "number", group: "frames", step: 1 },
+      { path: ["watch", "enabled"], label: "启用后台记录", labelEn: "Enable background watch", type: "checkbox", group: "watch" },
+      { path: ["watch", "intervalSec"], label: "轮询间隔秒", labelEn: "Watch interval sec", type: "number", group: "watch", step: 1 },
       { path: ["narrate", "defaultLast"], label: "默认取最近句数", labelEn: "Default last lines", type: "number", group: "narrate", step: 1 },
       { path: ["narrate", "maxChars"], label: "解说建议字数", labelEn: "Narration chars", type: "number", group: "narrate", step: 50 },
       { path: ["narrate", "defaultStyle"], label: "默认解说风格", labelEn: "Default style", type: "select", group: "narrate", options: [["陪玩解说", "陪玩解说"], ["剧情复盘", "剧情复盘"], ["冷知识吐槽", "冷知识吐槽"]] },
@@ -178,6 +180,7 @@ window.__ModuleLoader__.load({
       { id: "sources", zh: "知识源", en: "Knowledge sources", descZh: "虚空终端 MCP · DeepSeek Web Search", descEn: "Akasha MCP · DeepSeek web search" },
       { id: "vision", zh: "视觉分析", en: "Vision analysis", descZh: "本地构图 / UI / 地图启发式", descEn: "Local composition / UI / map heuristics" },
       { id: "frames", zh: "帧归档", en: "Frame archive", descZh: "本地 PNG + JSON；默认关闭", descEn: "Local PNG + JSON; off by default" },
+      { id: "watch", zh: "后台记录", en: "Background watch", descZh: "显式 start/stop；本地抓取，不自动启动", descEn: "Explicit start/stop; local capture, never auto-start" },
       { id: "narrate", zh: "解说", en: "Narration", descZh: "只出材料，不调用 LLM", descEn: "Material only; no LLM call" },
       { id: "overlay", zh: "游戏内悬浮窗", en: "In-game overlay", descZh: "置顶、穿透、不抢焦点", descEn: "Topmost, click-through, no focus" }
     ];
@@ -309,8 +312,8 @@ window.__ModuleLoader__.load({
 
       var isEn = Boolean(props.locale && props.locale.current === "en");
       var chips = isEn
-        ? ["Read-only", "6 tools", "Local OCR", "Akasha MCP", "DeepSeek search"]
-        : ["只读", "6 个工具", "本地 OCR", "虚空终端 MCP", "DeepSeek 搜索"];
+        ? ["Read-only", "7 tools", "Local OCR", "Akasha MCP", "DeepSeek search"]
+        : ["只读", "7 个工具", "本地 OCR", "虚空终端 MCP", "DeepSeek 搜索"];
       var mark = h("div", { className: "lc-mark" },
         h("svg", { viewBox: "0 0 24 24", width: "22", height: "22", "aria-hidden": "true" },
           h("path", { d: "M6 3.5h12v17l-6-4.2-6 4.2z", fill: "none", stroke: "#fff", strokeWidth: "1.8", strokeLinejoin: "round" }),

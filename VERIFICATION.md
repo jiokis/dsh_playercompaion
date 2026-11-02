@@ -14,9 +14,9 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 
 命令：node --test
 
-结果：54 / 54 通过。
+结果：57 / 57 通过。
 
-覆盖：config（volatile）、text/dedupe、store/query、narrate、wiki mock、tool-contract（6 个工具）、overlay manager、client bundle 注册、client 渲染树、Akasha MCP 解析/调用、WebSource 映射、lore_query 四源 fan-out、lore_vision 本地图片/frameId/实时参数/semantic OCR、帧归档保存/列表/读取/prune、capture frameId、readonly、agents-doc、query 默认 all。
+覆盖：config（volatile + watch）、text/dedupe、store/query、narrate、wiki mock、tool-contract（7 个工具）、overlay manager、client bundle 注册、client 渲染树、Akasha MCP 解析/调用、WebSource 映射、lore_query 四源 fan-out、lore_vision 本地图片/frameId/实时参数/semantic OCR、帧归档保存/列表/读取/prune、capture frameId、lore_watch 启动/计数/停止/禁用/重复启动、readonly、agents-doc、query 默认 all。
 
 ### Python 测试
 
@@ -54,12 +54,20 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 
 ### 插件层
 
-- apply 注册六个工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision。
+- apply 注册七个工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch。
 - lore_status 端到端：engine=ready（cache）、OCR ready、games 两个均为 null（游戏未运行）、dataDir 正确。
 - lore_capture 错误路径：无游戏窗口时返回 EngineError，消息里带可见窗口列表。
 - lore_query：默认 game=all；日志检索命中带 context；默认 all 的回归测试通过。
 - lore_narrate：返回 3 行 / 1 场景 / brief / prompt；prompt 包含不剧透约束。
 - 安装到 lore-dev profile 后，从安装目录 import + apply 成功，依赖解析正常。
+
+### 后台记录 v0.5.0
+
+- `lib/watcher.js`：显式 start/stop/status；启动先抓一次，再按 2..300 秒轮询；不自动启动。
+- 单元测试：fake capture 覆盖 captured/duplicate/skipped/empty/error、停止后不再 tick、禁用 start 拒绝、重复 start 拒绝、interval 下限 2 秒；57/57 通过。
+- 复用 capture 管线，因此前台/遮挡/黑帧/去重/日志/悬浮窗/帧归档与 `lore_capture` 一致；不上传、不调用模型。
+- `lore_status` 返回 `watch`；`lore_watch status` 返回 ticks/captured/duplicates/skipped/empty/errors/lastError。
+- 真实游戏长跑（连续记录、切图、暂停恢复）尚未验收。
 
 ### DSH 设置页与悬浮窗
 
@@ -68,7 +76,7 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 - 悬浮窗：重做后的 WPF 预览在 2560x1440 屏幕上以 480x220 显示在右上（日志：showing at 1199,28 size 480x220；source initialized），截图见 docs/preview-overlay.png；带左侧蓝轨、图标、绿色状态胶囊、金色说话人 badge、选项 chip。
 - 悬浮窗 manager：spawn 返回 pid、status running、hide/dispose 成功；缺脚本时返回可读错误。
 - 悬浮窗状态：显示凯瑟琳 / 冒险家协会接待员 / 正文 / 选项 / session+时间；置顶、鼠标穿透、不抢焦点。
-- 设置页 UI 重做：hero + 状态 chip、分组卡片、自定义 switch、粘性保存条；client-render 测试用假 React hook runtime 渲染出 hero/知识源/视觉分析（含语义 OCR 开关）/帧归档/开关/保存条，静态预览见 docs/preview-settings.png（fake React + 实际 CSS，非桌面实际渲染）。
+- 设置页 UI 重做：hero + 状态 chip、分组卡片、自定义 switch、粘性保存条；client-render 测试用假 React hook runtime 渲染出 hero/知识源/视觉分析（含语义 OCR 开关）/帧归档/后台记录/开关/保存条，静态预览见 docs/preview-settings.png（fake React + 实际 CSS，非桌面实际渲染）。
 - 插件 icon：icon.png 128x128，已写入 locale meta（data URL）和 package manifest；桌面列表显示待安装后确认。
 - 待桌面安装后确认：插件列表中的「旅途记录仪」标题/描述/icon、设置页的实际渲染。
 
@@ -116,6 +124,7 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 ### DSH 安装与 UI
 
 - [ ] 桌面版插件 UI 安装 `D:/path/to/dsh-lore-companion`、启用并完全重启；确认插件列表显示「旅途记录仪」标题/描述/自定义 icon。
+- [ ] 真实游戏运行 `lore_watch start` 连续记录 2–3 分钟，再 stop/status，确认重复/遮挡/切图行为与日志一致。
 - [ ] 打开 bundle 设置页，确认 hero/分组卡片/switch/知识源/视觉分析/帧归档字段的实际渲染；保存后重启生效。
 - [ ] 安装后 `lore_status` 的 `sources.web.available=true`，`lore_query` 实际走通 DeepSeek Search；Akasha 实际返回 pathHash。
 - [ ] 新会话确认 `lore_vision` 工具出现；用游戏窗口跑一次实时 composition/ui/map，检查标注图与遮挡检查。

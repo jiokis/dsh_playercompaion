@@ -8,8 +8,8 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 
 ## Status
 
-- v0.4.0 code complete: lore_status, lore_capture, lore_query, lore_narrate, lore_overlay, lore_vision.
-- Automated tests: 54 Node tests + 22 Python tests pass.
+- v0.5.0 code complete: lore_status, lore_capture, lore_query, lore_narrate, lore_overlay, lore_vision, lore_watch.
+- Automated tests: 57 Node tests + 22 Python tests pass.
 - Verified: uv bootstrap cache hit, DXcam capture, synthetic Chinese OCR (99.7% score), real-window capture/OCR, end-to-end lore_status.
 - BWIKI live: Genshin 派蒙 and HSR 三月七 both search, fetch, cache and return cleaned snippets; redirects are followed.
 - Akasha live: MCP initialize + akasha_search returned five 凯瑟琳 pathHashes and parsed body snippets.
@@ -20,8 +20,8 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 - v1.3 vision alpha: `lore_vision` performs local composition/UI/map heuristics on the live window or a local PNG/JPG/WebP; real-crop end-to-end passes; annotated preview at `docs/preview-vision.png`.
 - v0.3.0 frame archive: optional local window PNG + JSON (off by default), `lore_status` lists recent frames, `lore_vision` can re-analyze by `frameId`, with maxFrames/retentionDays cleanup.
 - v0.4.0 local semantics: `mode=semantic` uses OCR text + geometry for scene classification (dialogue/map/menu/scene), text blocks, nearby POI labels and composition/readability advice; real crop: scene=dialogue, textBlocks=3.
-- Star Rail real dialogue, a 10-minute session, and the 10-screenshot CER gate are still pending.
-- lore_watch (continuous background recording) is phase 2, not implemented.
+- v0.5.0 background watch: `lore_watch` has explicit start/stop/status and reuses the capture pipeline; unit tests cover start, duplicate/skip/empty/error, stop and double-start. Real-game long-run acceptance is still pending.
+- Star Rail real dialogue, a 10-minute session, the 10-screenshot CER gate, and a real-game watch long run are still pending.
 
 ## Tools
 
@@ -33,6 +33,7 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 | lore_narrate | Build transcript/scenes/brief/prompt; does not call an LLM |
 | lore_overlay | Show/hide/inspect the in-game overlay; topmost, click-through, never takes focus |
 | lore_vision | Local composition / UI / map / semantic heuristics; live window, local image or frameId, optional annotated crop; no model call |
+| lore_watch | Explicit start/stop/status for background polling; reuses capture, dedupe and the local log; never auto-starts |
 
 ## Knowledge sources
 
@@ -67,6 +68,20 @@ Select explicitly with `sources: ["log", "wiki"]` or `sources: ["akasha", "web"]
 This is v1.3 alpha: geometry + OCR-keyword semantics, not model understanding. Optional VLM and deeper map semantics are next.
 
 ![Vision annotation preview (real screenshot crop)](docs/preview-vision.png)
+
+## Background watch
+
+`lore_watch` is explicit background polling; it never starts with the plugin:
+
+- `action=start`: capture once, then poll every `intervalSec` (2..300, default 8); default session `watch-YYYYMMDD`.
+- `action=status`: running/busy/ticks/captured/duplicates/skipped/empty/errors/lastError.
+- `action=stop`: clear the timer and abort the in-flight request.
+- Reuses the `lore_capture` pipeline: foreground/occlusion/black-frame checks, OCR, dedupe, local log, overlay and optional frame archive; no model and no upload.
+- `watch.enabled=false` refuses start; plugin dispose stops it.
+
+```json
+{ "tool": "lore_watch", "action": "start", "game": "genshin", "intervalSec": 8 }
+```
 
 ## Requirements
 
@@ -192,7 +207,7 @@ See README.zh.md for the full Chinese guide, config, data schema and troubleshoo
 - OCR is imperfect; raw text and confidence are kept, no silent correction.
 - BWIKI is third-party and may be stale or blocked; no cache means no fabricated answer.
 - GameKee is not integrated in v1.
-- lore_watch is not implemented yet.
+- lore_watch requires an explicit start and never records automatically; a real-game long run is not yet accepted.
 - No web settings panel; configuration is via the profile YAML.
 
 ## License

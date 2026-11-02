@@ -6,13 +6,13 @@
 
 ## 0. 当前阶段
 
-- v0.4.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision。
+- v0.5.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch。
 - v1 附带 DSH 设置页（client.js）和游戏内 WPF 悬浮窗（overlay/overlay.ps1）。
 - 多源检索：本地日志、BWIKI、虚空终端 Akasha MCP（akasha_search）、DSH ctx.web.search（DeepSeek Search API）。
 - 图像元素分析 v1.3 alpha：本地 `lore_vision` 已实现 composition/ui/map/semantic 启发式（实时窗口、本地图片或归档 frameId）。
 - 本地语义：mode=semantic 用 OCR 文本 + 几何做场景分类、文字块、POI 邻近标签与建议；不调用模型。
 - 帧归档：可选本地 PNG + JSON（默认关闭），`lore_status` 列最近帧，`lore_vision` 可复分析；VLM/语义地图仍在 ROADMAP.md。
-- v1 手动触发 capture；lore_watch 后台连续记录是第二阶段，尚未实现。
+- v0.5.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
 - 只读；不注入输入、不读游戏内存、不改游戏文件、不抢焦点、不上传截图或日志。远程检索只发 query/world 等必要参数。
 - 需要子智能体时统一用 **dsh-opencode-go / minimax-m3.1-flash**。插件 v1 不内置子智能体或 LLM 调用。
 
@@ -70,7 +70,7 @@
 ## 3. 架构与数据流
 
     DSH Host (Node, ESM)
-      lib/index.js        apply(): 读配置、注册 6 个工具、启动自举、dispose
+      lib/index.js        apply(): 读配置、注册 7 个工具、启动自举、dispose
       lib/config.js       schemastery Config + resolveConfig（默认值 + 环境变量）
       lib/bootstrap.js    uv venv + requirements + 健康检查 + warmup + 缓存
       lib/engine.js       stdio JSON-lines 客户端（超时/崩溃/退出清理）
@@ -80,7 +80,9 @@
       lib/sources/akasha.js 虚空终端 MCP 客户端 + akasha_search 解析
       lib/sources/web.js   DSH ctx.web.search 适配（DeepSeek Search）
       lib/frames.js        可选本地帧归档（PNG + JSON、retention）
+      lib/watcher.js       显式后台轮询（start/stop/status，不自动启动）
       lib/tools/vision.js  lore_vision 工具（实时/本地图片/frameId + 附件）
+      lib/tools/watch.js   lore_watch 工具（后台轮询控制）
       lib/narrate.js      分场景、关键句、brief、prompt
       lib/render.js       工具结果的简洁文本渲染
       lib/overlay.js      WPF 悬浮窗进程管理 + state 文件
@@ -118,7 +120,7 @@
 ### lore_status
 
 - 参数：preview?、game?（auto/genshin/hsr）、window?。
-- 返回：plugin/version/platform、engine 状态、dataDir、games、ocr、wiki、sessions、overlay、sources（akasha/web 可用性）、frames（最近归档）、preview、previewError、attachment、warnings。
+- 返回：plugin/version/platform、engine 状态、dataDir、games、ocr、wiki、sessions、overlay、sources（akasha/web 可用性）、frames（最近归档）、watch（后台状态）、preview、previewError、attachment、warnings。
 - preview=true 抓一帧、跑区域检测和 OCR、返回裁剪图附件；不写日志。
 - 引擎 installing/failed 作为正常状态返回，不抛异常。
 
@@ -162,10 +164,13 @@
 - 返回 analysis（findings/elements/metrics/sections/warnings；semantic 含 scene/textBlocks/POI 标签/建议）、annotated image attachment（可选）、source（screen/image/frame）、frameId（可选）。
 - 本地 OpenCV 启发式：构图、UI 面板、地图 POI 候选；不做语义断言、不寻路、不注入输入。
 
-### lore_watch（第二阶段，未实现）
+### lore_watch
 
-- 计划：ctx.jobs.start 后台轮询，start/stop/status，共用 capture 管线；默认不向 agent 注入通知。
-- 在实现前不要把它写进工具列表或 README 的“已支持”。
+- 参数：action（start/stop/status，必填）、intervalSec?（2..300，默认 config.watch.intervalSec=8）、game?、window?、session?、note?、mode?（dialogue/read）。
+- start 只在显式调用时启动；默认 session `watch-YYYYMMDD`，note `watch`；不自动启动、不向 agent 注入通知。
+- 复用 capture 管线：前台/遮挡/黑帧检查、OCR、去重、本地日志、悬浮窗、可选帧归档；错误只累计到 status，不伪造成功。
+- status 返回 running/busy/ticks/captured/duplicates/skipped/empty/errors/lastAt/lastResult/lastError；stop 取消定时器和当前请求。
+- 设置页 watch.enabled 关闭时拒绝 start；插件 dispose 自动 stop。
 
 ## 5. 开发命令
 
@@ -253,6 +258,7 @@ Python 测试：
 - 多源：test/sources.test.mjs 覆盖 Akasha MCP JSON-RPC/解析、WebSource 映射、lore_query 四路 fan-out。
 - 视觉：test/vision.test.mjs 覆盖本地图片/frameId/实时参数/semantic OCR/禁用/坏路径；engine/tests/test_vision.py 覆盖合成图构图/UI/map/semantic 和 analyze_image 协议。
 - 帧归档：test/frames.test.mjs 覆盖保存/列表/读取/prune/禁用；真实 e2e 见 scripts/vision-e2e.mjs。
+- 后台记录：test/watch.test.mjs 覆盖显式启动、捕获/重复/跳过/空/错误计数、停止、禁用和重复启动；真实游戏连续记录仍需人工验收。
 - 真实游戏人工验收：两款各切无边框，站到有说话人+正文的对话前；lore_status preview 看裁剪和 OCR；连续记 5–10 句；遮挡测试；10 分钟实录；lore_query 用特征台词找回上下文；lore_narrate 出 brief 并让主模型写解说。
 - 质量门槛：10 张真实对话截图，字符准确率 CER >=90%。低于门槛先调预处理/模型，不宣称 v1 完成。
 
@@ -267,6 +273,7 @@ Python 测试：
 - **悬浮窗不显示**：看 <dataDir>/overlay/overlay.log；确认 PowerShell 5.1 可用；脚本必须 UTF-8 with BOM；`lore_overlay show`；位置可能被其他置顶窗盖住。
 - **悬浮窗挡视线**：设置页改 position/width/height，或 `lore_overlay hide`。
 - **vision 结果很弱/地图候选乱**：本地启发式，先看 `analysis.metrics.mapLikelihood` 和 warnings；地图只给候选，不是游戏坐标。
+- **lore_watch 不记录**：先 `lore_watch status` 看 lastError/ticks；确认设置页 watch.enabled；游戏无边框且前台；需要时先手动 `lore_capture` 验证同一管线。
 - **JSONL 坏行**：读取会跳过并报 corruptLines；不要整文件重写，先备份。
 - **清数据**：删 <dataDir> 会丢日志和 Wiki 缓存，不可恢复；执行前明确告知用户。
 - **引擎缓存**：删 engine/0.1.0-<hash> 只会触发重装，不影响日志。
@@ -281,7 +288,7 @@ Python 测试：
 
 ## 10. Definition of Done
 
-- [ ] 6 个工具出现在 DSH 工具列表（含 lore_overlay、lore_vision），lore_status 能报告引擎/窗口/OCR/数据目录/悬浮窗。
+- [ ] 7 个工具出现在 DSH 工具列表（含 lore_overlay、lore_vision、lore_watch），lore_status 能报告引擎/窗口/OCR/数据目录/悬浮窗/后台记录。
 - [ ] 真实游戏能 lore_capture 写入 JSONL；重复只写 seen；推进后记新句。
 - [ ] 遮挡/最小化/找不到窗口会拒绝并写清楚原因，不写日志。
 - [ ] lore_query 能按关键词/时间/会话命中；本地/BWIKI/Akasha/Web 四源可选择；断网回退缓存；无缓存不编造。
@@ -290,6 +297,7 @@ Python 测试：
 - [ ] 游戏内悬浮窗置顶、鼠标穿透、不抢焦点，显示最近一次 capture。
 - [ ] lore_vision 能在本地图片/实时窗口/归档 frameId 上返回构图、UI 面板、地图候选、语义场景/文字块与可选标注图，且不上传。
 - [ ] 帧归档默认关闭；开启后保存 PNG+JSON，受 maxFrames/retentionDays 限制。
+- [ ] lore_watch 只在显式 start 后轮询，stop/dispose 能停止；重复/空/遮挡/错误状态可查，不自动向 agent 注入通知。
 - [ ] DSH 设置页/悬浮窗使用 DSH 暗色表面、细边框、蓝色强调与状态胶囊；插件列表显示自定义 icon。
 - [ ] Node/Python 单测、工具契约、只读静态检查、agents-doc 检查通过。
 - [ ] 10 张真实截图 CER >=90% 记录在 README。

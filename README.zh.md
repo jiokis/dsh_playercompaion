@@ -12,8 +12,8 @@
 
 ## 当前状态
 
-- v0.4.0 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision。
-- 自动测试：Node 54 项、Python 22 项全部通过。
+- v0.5.0 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch。
+- 自动测试：Node 57 项、Python 22 项全部通过。
 - 已实测：uv 自举（缓存命中）、DXcam 抓屏、合成中文图 OCR（99.7% 置信度）、真实窗口（Windows 设置）抓屏 + OCR、lore_status 端到端。
 - BWIKI 实测：原神「派蒙」、星铁「三月七」都能搜到并写入本地缓存（各 3 页），redirect 跟随与去导航清洗已生效。
 - 虚空终端实测：Akasha MCP 的 `initialize` + `akasha_search` 返回「凯瑟琳」5 个 pathHash，正文片段解析正确。
@@ -26,8 +26,8 @@
 - **v1.3 视觉分析 alpha 已落地**：`lore_vision` 本地分析构图/UI/地图启发式，支持实时游戏窗口或本地 PNG/JPG；真实截图端到端通过，标注图见 `docs/preview-vision.png`。
 - **v0.3.0 帧归档**：可选保存窗口 PNG + JSON（默认关闭），`lore_status` 列出最近帧，`lore_vision` 可用 `frameId` 复分析；带 maxFrames/retentionDays 清理。
 - **v0.4.0 本地语义**：`mode=semantic` 用 OCR 文本 + 几何做场景分类（对话/地图/菜单/场景）、文字块、POI 邻近标签和构图/可读性建议；真实截图 scene=dialogue、textBlocks=3。
-- **还差**：星铁真实对话、10 分钟实录、10 张真实截图 CER ≥90%。
-- lore_watch（后台连续记录）是第二阶段，尚未实现。
+- **v0.5.0 后台记录**：`lore_watch` 显式 start/stop/status，复用 capture 管线；unit 覆盖启动、重复/跳过/空/错误、停止和重复启动。真实游戏连续记录仍待人工验收。
+- **还差**：星铁真实对话、10 分钟实录、10 张真实截图 CER ≥90%；真实游戏 lore_watch 长跑。
 
 ## 工具
 
@@ -39,6 +39,7 @@
 | lore_narrate | 把最近剧情整理成 transcript、分场景、brief 和 prompt；不调用 LLM |
 | lore_overlay | 显示/隐藏/查看游戏内悬浮窗；置顶、鼠标穿透、不抢焦点 |
 | lore_vision | 本地构图 / UI / 地图 / 语义启发式分析；实时窗口、本地图片或 frameId，可返回标注图；不调用模型 |
+| lore_watch | 显式开始/停止/查看后台轮询；复用 capture 管线、去重和本地日志；不自动启动 |
 
 ## 知识源
 
@@ -74,6 +75,20 @@ lore_query 默认 `scope=all`，同时查四路；网络源失败只加 warning�
 
 帧归档默认关闭，保存在本机 `<dataDir>/frames/<game>/<date>/`；启用后 `lore_status` 会列出最近帧，`lore_vision` 可用 frameId 复分析。
 
+## 后台记录
+
+`lore_watch` 是显式的后台轮询，不会随插件加载自动开始：
+
+- `action=start`：立即抓一次，然后按 `intervalSec`（2..300，默认 8）轮询；默认 session `watch-YYYYMMDD`。
+- `action=status`：返回 running/busy/ticks/captured/duplicates/skipped/empty/errors/lastError。
+- `action=stop`：停止定时器并 abort 当前请求。
+- 复用 `lore_capture` 管线：前台/遮挡/黑帧检查、OCR、去重、本地日志、悬浮窗、可选帧归档；不调用模型、不上传。
+- `watch.enabled=false` 时拒绝 start；插件 dispose 会自动 stop。
+
+```json
+{ "tool": "lore_watch", "action": "start", "game": "genshin", "intervalSec": 8 }
+```
+
 ## 环境要求
 
 - Windows 10/11
@@ -105,7 +120,7 @@ lore_query 默认 `scope=all`，同时查四路；网络源失败只加 warning�
 2. 打开 DSH 桌面版 → 插件 → 添加插件 → 安装第三方插件。
 3. 输入本地路径 D:/path/to/dsh-lore-companion → 安装 → 启用。
 4. 完全退出并重启桌面版。
-5. 新会话调用 lore_status，确认六个工具出现、engine 为 ready。
+5. 新会话调用 lore_status，确认七个工具出现、engine 为 ready。
 6. 插件页会出现「旅途记录仪」卡片和设置页（DSH 风格），修改配置后保存并重启 DSH 生效。
 
 开发/自动化可以用独立 profile，不要动 desktop：
@@ -117,7 +132,7 @@ lore_query 默认 `scope=all`，同时查四路；网络源失败只加 warning�
 
     pnpm pack
 
-生成 dsh-lore-companion-0.4.0.tgz，可在插件 UI 用本地压缩包安装。
+生成 dsh-lore-companion-0.5.0.tgz，可在插件 UI 用本地压缩包安装。
 
 ## 首次自举与镜像
 
@@ -231,6 +246,9 @@ v1.3 alpha 已把 composition / ui / map 的本地启发式接进 `lore_vision`�
           saveVision: true
           maxFrames: 200
           retentionDays: 7
+        watch:
+          enabled: true
+          intervalSec: 8
         overlay:
           enabled: true
           autoShow: true
@@ -295,7 +313,7 @@ v1.3 alpha 已把 composition / ui / map 的本地启发式接进 `lore_vision`�
 - OCR 对游戏字体/背景仍有误差；日志保留原始文本和置信度，不静默纠正。
 - BWIKI 是第三方来源，可能过时或被 WAF 拦截；无缓存时不编造。
 - GameKee 未接入；v1 只做 BWIKI。
-- lore_watch 尚未实现。
+- lore_watch 需要显式 `start`，不自动记录；真实游戏长跑尚未验收。
 - 没有 Web 设置面板；配置走 profile YAML。
 
 ## 开发

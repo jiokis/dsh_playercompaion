@@ -7,6 +7,7 @@ import { createQueryTool } from '../lib/tools/query.js'
 import { createNarrateTool } from '../lib/tools/narrate.js'
 import { createOverlayTool } from '../lib/tools/overlay.js'
 import { createVisionTool } from '../lib/tools/vision.js'
+import { createWatchTool } from '../lib/tools/watch.js'
 
 const config = resolveConfig({})
 const runtime = {
@@ -30,15 +31,21 @@ const overlay = {
   status: () => ({ running: false, pid: null, state: { visible: false } })
 }
 const ctx = { attachments: { saveImage: async () => ({ attachmentId: 'a' }) } }
+const watcher = {
+  status: () => ({ enabled: true, running: false, intervalSec: 8, ticks: 0 }),
+  start: async () => ({ enabled: true, running: true, intervalSec: 8, ticks: 1 }),
+  stop: () => ({ enabled: true, running: false, intervalSec: 8, ticks: 1 })
+}
 
 test('tool definitions satisfy the host defineTool contract', () => {
   const tools = [
-    createStatusTool({ config, runtime, logStore, wikiSearch, ctx, overlay, version: '0.4.0' }),
+    createStatusTool({ config, runtime, logStore, wikiSearch, ctx, overlay, watcher, version: '0.5.0' }),
     createCaptureTool({ config, runtime, logStore, ctx, overlay }),
     createQueryTool({ config, logStore, wikiSearch }),
     createNarrateTool({ config, logStore, wikiSearch }),
     createOverlayTool({ config, overlay }),
-    createVisionTool({ config, runtime, ctx })
+    createVisionTool({ config, runtime, ctx }),
+    createWatchTool({ config, watcher })
   ]
   for (const tool of tools) {
     assert.equal(typeof tool.name, 'string')
@@ -47,5 +54,5 @@ test('tool definitions satisfy the host defineTool contract', () => {
     assert.ok(tool.parameters && typeof tool.parameters === 'object')
     assert.ok(tool.output && tool.output.schema && typeof tool.output.render === 'function')
   }
-  assert.deepEqual(tools.map((tool) => tool.name), ['lore_status', 'lore_capture', 'lore_query', 'lore_narrate', 'lore_overlay', 'lore_vision'])
+  assert.deepEqual(tools.map((tool) => tool.name), ['lore_status', 'lore_capture', 'lore_query', 'lore_narrate', 'lore_overlay', 'lore_vision', 'lore_watch'])
 })
