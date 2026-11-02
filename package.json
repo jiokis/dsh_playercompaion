@@ -1,0 +1,73 @@
+{
+  "name": "dsh-lore-companion",
+  "version": "0.4.0",
+  "description": "Read-only Genshin Impact / Honkai: Star Rail lore companion for DeepSeek Harness: local screen OCR -> story log -> wiki lookup -> narration material, with a DSH settings page and an in-game overlay.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jiokis/dsh_playercompaion.git"
+  },
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "lib",
+    "client.js",
+    "locale",
+    "overlay",
+    "engine/lore_engine",
+    "engine/requirements.txt",
+    "cordis.patch.yml",
+    "AGENTS.md",
+    "README.md",
+    "README.zh.md",
+    "VERIFICATION.md",
+    "LICENSE",
+    "icon.png",
+    "ROADMAP.md",
+    "docs"
+  ],
+  "scripts": {
+    "test": "node --test",
+    "smoke": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/smoke.ps1",
+    "bootstrap": "node scripts/bootstrap-smoke.mjs",
+    "dev:install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/dev-install.ps1"
+  },
+  "dependencies": {
+    "@deepseek-ai/dsh-tools": "0.2.1-rc.2",
+    "@deepseek-ai/schemastery": "^3.18.5"
+  },
+  "engines": {
+    "node": ">=22",
+    "dsh": ">=0.2.1-rc.2 <0.3.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    },
+    "compatibility": {
+      "dsh": ">=0.2.1-rc.2 <0.3.0",
+      "node": ">=22"
+    }
+  },
+  "license": "MIT",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "genshin",
+    "star-rail",
+    "ocr",
+    "lore",
+    "overlay",
+    "dsh-ui"
+  ],
+  "icon": "./icon.png"
+}

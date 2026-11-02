@@ -1,0 +1,4 @@
+# dsh-lore-companion bundle patch: mount the plugin row.
+- insert:
+    - id: lore-companion
+      name: dsh-lore-companion
