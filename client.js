@@ -14,6 +14,8 @@ window.__ModuleLoader__.load({
     Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
     var react = require("react");
     var h = react.createElement;
+    var reactDom = null;
+    try { reactDom = require("react-dom"); } catch (error) { /* portal is optional */ }
 
     var CSS = [
       ".lc-root{max-width:840px;display:flex;flex-direction:column;gap:14px;font-size:13px;line-height:1.65;color:var(--dsw-alias-label-primary,#e8ecf4);font-family:var(--dsw-font-family,'Microsoft YaHei UI',system-ui,sans-serif)}",
@@ -66,6 +68,7 @@ window.__ModuleLoader__.load({
       ".lc-watch-dot{width:6px;height:6px;border-radius:50%;background:#6f8dff;box-shadow:0 0 7px rgba(111,141,255,.65);flex:none}",
       ".lc-watch-on .lc-watch-dot{background:#4ed89a;box-shadow:0 0 7px rgba(78,216,154,.7)}",
       ".lc-watch-count{color:var(--dsw-alias-label-tertiary,#71809a);font-size:10px;font-variant-numeric:tabular-nums;margin-left:1px}",
+      ".lc-watch-slot{display:inline-flex;align-items:center;margin-left:4px}",
       "@media (max-width:640px){.lc-grid{grid-template-columns:1fr}.lc-hero{padding:14px}}"
     ].join("");
 
@@ -449,13 +452,24 @@ window.__ModuleLoader__.load({
     function WatchButton(props) {
       var execute = props.execute;
       var t = props.t;
+      var invoke = function (command) {
+        return Promise.resolve(execute(command)).then(function (result) {
+          if (result && typeof result === "object" && result.ok === false) {
+            throw new Error(result.error && (result.error.message || result.error.code) || "watch remote failed");
+          }
+          return result && typeof result === "object" && Object.prototype.hasOwnProperty.call(result, "value") ? result.value : result;
+        });
+      };
       var stateHook = react.useState({ status: null, busy: false, error: null });
       var state = stateHook[0];
       var setState = stateHook[1];
+      var hostHook = react.useState(null);
+      var portalHost = hostHook[0];
+      var setPortalHost = hostHook[1];
       react.useEffect(function () {
         var alive = true;
         var refresh = function () {
-          execute({ action: "status" }).then(function (status) {
+          invoke({ action: "status" }).then(function (status) {
             if (!alive) return;
             setState(function (previous) { return Object.assign({}, previous, { status: status, error: null }); });
           }).catch(function (error) {
@@ -467,6 +481,28 @@ window.__ModuleLoader__.load({
         var timer = setInterval(refresh, 2000);
         return function () { alive = false; clearInterval(timer); };
       }, [execute]);
+      react.useEffect(function () {
+        if (!reactDom || typeof document === "undefined") return;
+        var host = null;
+        var attempts = 0;
+        var attach = function () {
+          if (host && host.isConnected) return true;
+          var tabs = document.querySelector("[data-conversation-tabs]");
+          if (!tabs) return false;
+          host = document.createElement("span");
+          host.className = "lc-watch-slot";
+          tabs.appendChild(host);
+          setPortalHost(host);
+          return true;
+        };
+        if (attach()) {
+          return function () { if (host) host.remove(); setPortalHost(null); };
+        }
+        var timer = setInterval(function () {
+          if (attach() || ++attempts >= 24) clearInterval(timer);
+        }, 250);
+        return function () { clearInterval(timer); if (host) host.remove(); setPortalHost(null); };
+      }, []);
       var running = Boolean(state.status && state.status.running);
       var busy = state.busy;
       var label = busy ? t("watchBusy") : running ? t("watchStop") : t("watchStart");
@@ -476,7 +512,7 @@ window.__ModuleLoader__.load({
         setState(function (previous) { return Object.assign({}, previous, { busy: true, error: null }); });
         var action = running ? "stop" : "start";
         var command = action === "start" ? { action: action, game: "auto", intervalSec: 8 } : { action: action };
-        execute(command).then(function (status) {
+        invoke(command).then(function (status) {
           setState(function (previous) { return Object.assign({}, previous, { status: status, busy: false, error: null }); });
         }).catch(function (error) {
           setState(function (previous) { return Object.assign({}, previous, { busy: false, error: String(error && error.message || error) }); });
@@ -489,7 +525,7 @@ window.__ModuleLoader__.load({
       if (running && state.status && state.status.ticks) {
         children.push(h("span", { className: "lc-watch-count", key: "count" }, String(state.status.ticks)));
       }
-      return h("button", {
+      var button = h("button", {
         className: "lc-watch" + (running ? " lc-watch-on" : ""),
         type: "button",
         "aria-label": label,
@@ -498,6 +534,7 @@ window.__ModuleLoader__.load({
         disabled: busy,
         onClick: toggle
       }, children);
+      return portalHost && reactDom ? reactDom.createPortal(button, portalHost) : button;
     }
 
     var inject = ["slots", "locale", "configForms", "remote"];
@@ -519,11 +556,11 @@ window.__ModuleLoader__.load({
         var mounted = ctx.remote.$mount(watchRemote);
         ctx.effect(function () { return Promise.resolve(mounted); }, "dsh-lore-companion: mount watch remote");
         ctx.inject(["remote.loreWatch"], function (ready) {
-          ctx.slots.inject("conversation.input.right", function () {
+          ctx.slots.inject("conversation.session.header.actions", function () {
             return ctx.slots.register({
-              name: "conversation.input.right",
+              name: "conversation.session.header.actions",
               id: "lore-watch-button",
-              order: 10,
+              order: 100,
               inject: function () {
                 return { execute: ready.remote.loreWatch.execute, t: t };
               }
