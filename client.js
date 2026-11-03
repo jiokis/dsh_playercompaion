@@ -861,7 +861,7 @@ window.__ModuleLoader__.load({
                 journalExecuteRef.execute(command).then(resolve, reject);
               } else if (++attempts >= 40) {
                 clearInterval(timer);
-                reject(new Error("记录服务尚未连接，请稍后刷新"));
+                reject(new Error("记录服务尚未连接：后台仍是旧版，完全退出 DSH 后重开"));
               }
             }, 200);
           });
