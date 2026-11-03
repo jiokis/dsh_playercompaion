@@ -836,20 +836,6 @@ window.__ModuleLoader__.load({
         });
       });
       if (ctx.remote && typeof ctx.remote.$mount === "function") {
-        var mounted = ctx.remote.$mount(watchRemote);
-        ctx.effect(function () { return Promise.resolve(mounted); }, "dsh-lore-companion: mount watch remote");
-        ctx.inject(["remote.loreWatch"], function (ready) {
-          ctx.slots.inject("conversation.session.header.actions", function () {
-            return ctx.slots.register({
-              name: "conversation.session.header.actions",
-              id: "lore-watch-button",
-              order: 100,
-              inject: function () {
-                return { execute: ready.remote.loreWatch.execute, t: t };
-              }
-            }, WatchButton);
-          });
-        });
         var journalExecuteRef = null;
         var journalExecute = function (command) {
           if (journalExecuteRef) return journalExecuteRef.execute(command);
@@ -866,8 +852,21 @@ window.__ModuleLoader__.load({
             }, 200);
           });
         };
-        var journalMounted = ctx.remote.$mount(journalRemote);
-        ctx.effect(function () { return Promise.resolve(journalMounted); }, "dsh-lore-companion: mount journal remote");
+        var mounted = ctx.remote.$mount(watchRemote);
+        ctx.effect(function () { return Promise.resolve(mounted); }, "dsh-lore-companion: mount watch remote");
+        ctx.inject(["remote.loreWatch"], function (ready) {
+          journalExecuteRef = ready.remote.loreWatch;
+          ctx.slots.inject("conversation.session.header.actions", function () {
+            return ctx.slots.register({
+              name: "conversation.session.header.actions",
+              id: "lore-watch-button",
+              order: 100,
+              inject: function () {
+                return { execute: ready.remote.loreWatch.execute, t: t };
+              }
+            }, WatchButton);
+          });
+        });
         ctx.slots.inject("conversation.view", function () {
           return ctx.slots.register({
             name: "conversation.view",
@@ -878,9 +877,6 @@ window.__ModuleLoader__.load({
               return { execute: journalExecute };
             }
           }, JournalView);
-        });
-        ctx.inject(["remote.loreJournal"], function (ready) {
-          journalExecuteRef = ready.remote.loreJournal;
         });
       }
     }
