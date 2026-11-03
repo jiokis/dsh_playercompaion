@@ -850,20 +850,37 @@ window.__ModuleLoader__.load({
             }, WatchButton);
           });
         });
+        var journalExecuteRef = null;
+        var journalExecute = function (command) {
+          if (journalExecuteRef) return journalExecuteRef.execute(command);
+          return new Promise(function (resolve, reject) {
+            var attempts = 0;
+            var timer = setInterval(function () {
+              if (journalExecuteRef) {
+                clearInterval(timer);
+                journalExecuteRef.execute(command).then(resolve, reject);
+              } else if (++attempts >= 40) {
+                clearInterval(timer);
+                reject(new Error("记录服务尚未连接，请稍后刷新"));
+              }
+            }, 200);
+          });
+        };
         var journalMounted = ctx.remote.$mount(journalRemote);
         ctx.effect(function () { return Promise.resolve(journalMounted); }, "dsh-lore-companion: mount journal remote");
+        ctx.slots.inject("conversation.view", function () {
+          return ctx.slots.register({
+            name: "conversation.view",
+            id: "lore-journal",
+            order: 20,
+            label: function () { return "旅途"; },
+            inject: function () {
+              return { execute: journalExecute };
+            }
+          }, JournalView);
+        });
         ctx.inject(["remote.loreJournal"], function (ready) {
-          ctx.slots.inject("conversation.view", function () {
-            return ctx.slots.register({
-              name: "conversation.view",
-              id: "lore-journal",
-              order: 20,
-              label: function () { return "旅途"; },
-              inject: function () {
-                return { execute: ready.remote.loreJournal.execute };
-              }
-            }, JournalView);
-          });
+          journalExecuteRef = ready.remote.loreJournal;
         });
       }
     }
