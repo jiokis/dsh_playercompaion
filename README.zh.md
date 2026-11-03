@@ -12,7 +12,7 @@
 
 ## 当前状态
 
-- v0.7.0 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch。
+- v0.7.1 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch。
 - 自动测试：Node 64 项、Python 28 项全部通过。
 - 已实测：uv 自举（缓存命中）、DXcam 抓屏、合成中文图 OCR（99.7% 置信度）、真实窗口（Windows 设置）抓屏 + OCR、lore_status 端到端。
 - BWIKI 实测：原神「派蒙」、星铁「三月七」都能搜到并写入本地缓存（各 3 页），redirect 跟随与去导航清洗已生效。
@@ -22,7 +22,7 @@
 - 原神无边框实测：DXcam 抓屏成功；书页「召回 / UID」和桌面多窗口误抓已被 UI/前台检查拦下。
 - **原神真实对话已通过**：凯瑟琳 / 冒险家协会接待员 / 正文 / 右侧选项都能拆出；JSONL 写入、第二次抓取 duplicate+seen、按角色名查询、lore_narrate 素材都跑通。
 - DSH 设置页：`client.js` 注册 `plugins.bundle.config`，`configForms` 绑定 `lore-companion`；bundle 注册测试通过。UI 改成 DSH 风格：hero、状态 chip、分组卡片、开关、粘性保存条。
-- 游戏内悬浮窗：v0.7.0 可拖动、可折叠成圆球；带状态胶囊、说话人 badge、正文和截图/分析/阅读/查找按钮（`docs/preview-overlay.png`）；manager spawn/hide/dispose 冒烟通过。
+- 游戏内悬浮窗：v0.7.1 可拖动、可折叠成圆球；带状态胶囊、说话人 badge、正文和截图/分析/阅读/查找按钮（`docs/preview-overlay.png`）；manager spawn/hide/dispose 冒烟通过。
 - **v1.3 视觉分析 alpha 已落地**：`lore_vision` 本地分析构图/UI/地图启发式，支持实时游戏窗口或本地 PNG/JPG；真实截图端到端通过，标注图见 `docs/preview-vision.png`。
 - **v0.3.0 帧归档**：可选保存窗口 PNG + JSON（默认关闭），`lore_status` 列出最近帧，`lore_vision` 可用 `frameId` 复分析；带 maxFrames/retentionDays 清理。
 - **v0.4.0 本地语义**：`mode=semantic` 用 OCR 文本 + 几何做场景分类（对话/地图/菜单/场景）、文字块、POI 邻近标签和构图/可读性建议；真实截图 scene=dialogue、textBlocks=3。
@@ -52,7 +52,7 @@
 
 ## 悬浮窗
 
-- 拖动标题栏移动；点右上角 `—` 收成 52px 圆球，点圆球展开；位置/折叠状态存在 `layout.json`。
+- 拖动标题栏移动；点右上角 `—` 收成 52px 圆球，圆球可拖动，单击圆球展开；位置/折叠状态存在 `layout.json`。
 - `截图`：抓当前窗口保存到 `<dataDir>/screenshots`；`分析`：本地视觉分析；`查找`：用当前说话人/台词查四路资料。
 - `阅读`：对更宽的阅读区域按 1600px OCR，专门处理书页/物品/任务文本；对话模式仍走气泡裁剪。
 - 修复拖动时 300ms 刷新把窗口拉回原位：拖动期间暂停位置重排；血条/Lv/操作提示在 OCR 层过滤。
@@ -149,7 +149,7 @@ lore_query 默认 `scope=all`，同时查四路；网络源失败只加 warning�
 
     pnpm pack
 
-生成 dsh-lore-companion-0.7.0.tgz，可在插件 UI 用本地压缩包安装。
+生成 dsh-lore-companion-0.7.1.tgz，可在插件 UI 用本地压缩包安装。
 
 ## 首次自举与镜像
 

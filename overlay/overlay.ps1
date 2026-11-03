@@ -244,7 +244,28 @@ try {
     })
 } catch {}
 try { $script:Window.FindName('BtnCollapse').Add_MouseLeftButtonUp({ if ($script:Layout.panelX -ge 0) { $script:Layout.ballX = $script:Layout.panelX; $script:Layout.ballY = $script:Layout.panelY }; $script:Layout.collapsed = $true; Save-Layout; Set-Mode $true $null }) } catch {}
-try { $script:Window.FindName('Ball').Add_MouseLeftButtonUp({ if ($script:Layout.ballX -ge 0) { $script:Layout.panelX = $script:Layout.ballX; $script:Layout.panelY = $script:Layout.ballY }; $script:Layout.collapsed = $false; Save-Layout; Set-Mode $false $null }) } catch {}
+try {
+    $script:Window.FindName('Ball').Add_MouseLeftButtonDown({
+        # Same drag primitive as the panel: a press+drag moves the ball,
+        # a press without movement expands it. Compare window coordinates
+        # instead of relying on a second click event (DragMove consumes it).
+        $startLeft = [double]$script:Window.Left
+        $startTop = [double]$script:Window.Top
+        $script:Dragging = $true
+        try { $script:Window.DragMove() } catch { } finally { $script:Dragging = $false }
+        $moved = ([Math]::Abs([double]$script:Window.Left - $startLeft) -gt 2) -or ([Math]::Abs([double]$script:Window.Top - $startTop) -gt 2)
+        if ($moved) {
+            $script:Layout.ballX = [double]$script:Window.Left
+            $script:Layout.ballY = [double]$script:Window.Top
+            Save-Layout
+        } else {
+            if ($script:Layout.ballX -ge 0) { $script:Layout.panelX = $script:Layout.ballX; $script:Layout.panelY = $script:Layout.ballY }
+            $script:Layout.collapsed = $false
+            Save-Layout
+            Set-Mode $false $null
+        }
+    })
+} catch {}
 try { $script:Window.FindName('BtnShot').Add_MouseLeftButtonUp({ Send-Command 'screenshot' }) } catch {}
 try { $script:Window.FindName('BtnAnalyze').Add_MouseLeftButtonUp({ Send-Command 'vision' }) } catch {}
 try { $script:Window.FindName('BtnRead').Add_MouseLeftButtonUp({ Send-Command 'read' }) } catch {}
