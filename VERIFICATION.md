@@ -26,7 +26,7 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 
 覆盖：windows 纯函数、region 合成图、OCR 合成中文图与说话人拆分、真实对话框说话人/头衔/正文/选项拆分、UI 噪声拒绝（血量/等级/操作提示）、protocol ping/非法请求/无窗口错误、vision 合成图构图/UI/map/semantic、analyze_image 协议、菜单/属性截图拒绝、低置信度短文本过滤。
 
-### 旅途视图 v0.7.2
+### 旅途视图 v0.7.3
 
 - DSH 会话顶部新增 `conversation.view`「旅途」：人物卡片、同场关系条、事件梗概、详细对话搜索。
 - `lib/journal.js` 纯本地聚合；`lib/journal-remote.js` 通过 Typert 暴露 snapshot；不调用模型、不上传。
