@@ -8,8 +8,8 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 
 ## Status
 
-- v0.5.0 code complete: lore_status, lore_capture, lore_query, lore_narrate, lore_overlay, lore_vision, lore_watch.
-- Automated tests: 57 Node tests + 22 Python tests pass.
+- v0.5.1 code complete: lore_status, lore_capture, lore_query, lore_narrate, lore_overlay, lore_vision, lore_watch.
+- Automated tests: 60 Node tests + 26 Python tests pass.
 - Verified: uv bootstrap cache hit, DXcam capture, synthetic Chinese OCR (99.7% score), real-window capture/OCR, end-to-end lore_status.
 - BWIKI live: Genshin 派蒙 and HSR 三月七 both search, fetch, cache and return cleaned snippets; redirects are followed.
 - Akasha live: MCP initialize + akasha_search returned five 凯瑟琳 pathHashes and parsed body snippets.
@@ -20,7 +20,7 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 - v1.3 vision alpha: `lore_vision` performs local composition/UI/map heuristics on the live window or a local PNG/JPG/WebP; real-crop end-to-end passes; annotated preview at `docs/preview-vision.png`.
 - v0.3.0 frame archive: optional local window PNG + JSON (off by default), `lore_status` lists recent frames, `lore_vision` can re-analyze by `frameId`, with maxFrames/retentionDays cleanup.
 - v0.4.0 local semantics: `mode=semantic` uses OCR text + geometry for scene classification (dialogue/map/menu/scene), text blocks, nearby POI labels and composition/readability advice; real crop: scene=dialogue, textBlocks=3.
-- v0.5.0 background watch: `lore_watch` has explicit start/stop/status and reuses the capture pipeline; unit tests cover start, duplicate/skip/empty/error, stop and double-start. Real-game long-run acceptance is still pending.
+- v0.5.1 background watch: `lore_watch` has explicit start/stop/status and reuses the capture pipeline; a **Start recording** pill now sits in the composer; unit tests cover start, duplicate/skip/empty/error, stop and double-start. Real-game long-run acceptance is still pending.
 - Star Rail real dialogue, a 10-minute session, the 10-screenshot CER gate, and a real-game watch long run are still pending.
 
 ## Tools
@@ -34,6 +34,15 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 | lore_overlay | Show/hide/inspect the in-game overlay; topmost, click-through, never takes focus |
 | lore_vision | Local composition / UI / map / semantic heuristics; live window, local image or frameId, optional annotated crop; no model call |
 | lore_watch | Explicit start/stop/status for background polling; reuses capture, dedupe and the local log; never auto-starts |
+
+## Main-screen start button
+
+After installing and **fully restarting DSH**, a pill sits to the right of the composer (next to the model picker):
+
+- `Start recording` starts `lore_watch` with an 8-second interval; the pill turns green and becomes `Stop recording`.
+- Click again to stop.
+- No settings page, no chat message; it drives the same background watcher as `lore_watch`.
+- If it is missing, the client bundle is stale: fully quit and restart DSH, not just refresh the page.
 
 ## Knowledge sources
 

@@ -41,6 +41,7 @@ test('lore_watch starts explicitly, counts captures, and stops', async () => {
   assert.equal(started.session.startsWith('watch-'), true)
   assert.equal(capture.calls[0].args.includeImage, false)
   assert.equal(capture.calls[0].args.mode, 'dialogue')
+  assert.equal('window' in capture.calls[0].args, false)
   assert.equal(capture.calls[0].hasSignal, true)
   assert.equal(timer.cleared, null)
   const stopped = watcher.stop()

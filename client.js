@@ -58,6 +58,14 @@ window.__ModuleLoader__.load({
       ".lc-ok{font-size:11.5px;color:var(--dsw-alias-state-success-primary,#4ed89a)}",
       ".lc-error{font-size:11.5px;color:var(--dsw-alias-state-error-primary,#f05b6a)}",
       ".lc-unavailable{font-size:13px;color:var(--dsw-alias-label-tertiary,#71809a);padding:8px 0}",
+      ".lc-watch{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;border:1px solid var(--dsw-alias-border-l2,#2a3140);background:rgba(255,255,255,.035);color:var(--dsw-alias-label-secondary,#aab6ca);font:inherit;font-size:11.5px;line-height:1;cursor:pointer;white-space:nowrap;transition:border-color .15s,background .15s,color .15s}",
+      ".lc-watch:hover:not(:disabled){border-color:#5b7cff;background:rgba(75,108,255,.12);color:var(--dsw-alias-label-primary,#e8ecf4)}",
+      ".lc-watch:disabled{opacity:.55;cursor:default}",
+      ".lc-watch-on{border-color:rgba(78,216,154,.4);background:rgba(78,216,154,.09);color:#8fe3b0}",
+      ".lc-watch-on:hover:not(:disabled){border-color:rgba(78,216,154,.65);background:rgba(78,216,154,.14);color:#b8f0cc}",
+      ".lc-watch-dot{width:6px;height:6px;border-radius:50%;background:#6f8dff;box-shadow:0 0 7px rgba(111,141,255,.65);flex:none}",
+      ".lc-watch-on .lc-watch-dot{background:#4ed89a;box-shadow:0 0 7px rgba(78,216,154,.7)}",
+      ".lc-watch-count{color:var(--dsw-alias-label-tertiary,#71809a);font-size:10px;font-variant-numeric:tabular-nums;margin-left:1px}",
       "@media (max-width:640px){.lc-grid{grid-template-columns:1fr}.lc-hero{padding:14px}}"
     ].join("");
 
@@ -91,6 +99,12 @@ window.__ModuleLoader__.load({
       wiki: "Wiki",
       narrate: "解说",
       overlay: "游戏内悬浮窗",
+      watchStart: "开始记录",
+      watchStop: "停止记录",
+      watchBusy: "处理中",
+      watchUnavailable: "记录不可用",
+      watchHintStart: "开始后台记录；切到游戏即可",
+      watchHintStop: "后台记录运行中；点击停止",
       hintData: "默认放在 %LOCALAPPDATA%/dsh-lore-companion/data。",
       hintOverlay: "悬浮窗置顶、鼠标穿透、不抢焦点；只在原神/星铁前台显示。"
     };
@@ -105,6 +119,12 @@ window.__ModuleLoader__.load({
       notApplied: "The host refused this write; refresh and retry.",
       notReady: "Configuration is not ready.",
       readOnly: "This configuration is read-only.",
+      watchStart: "Start recording",
+      watchStop: "Stop recording",
+      watchBusy: "Working",
+      watchUnavailable: "Recording unavailable",
+      watchHintStart: "Start background recording, then switch to the game",
+      watchHintStop: "Background recording is running; click to stop",
       error: "Save failed",
       advanced: "Advanced",
       data: "Data",
@@ -401,7 +421,86 @@ window.__ModuleLoader__.load({
       return h("div", { className: "lc-root" }, nodes);
     }
 
-    var inject = ["slots", "locale", "configForms"];
+    var watchCommandCodec = {
+      mode: "strict",
+      typeSymbol: "dsh-lore-companion#WatchCommand",
+      schema: { parse: function (value) { return value; } },
+      create: function () { return { parse: function (value) { return value; } }; }
+    };
+    var watchStatusCodec = {
+      mode: "strict",
+      typeSymbol: "dsh-lore-companion#WatchStatus",
+      schema: { parse: function (value) { return value; } },
+      create: function () { return { parse: function (value) { return value; } }; }
+    };
+    var watchRemote = {
+      package: "dsh-lore-companion",
+      descriptors: [{
+        id: "dsh-lore-companion#loreWatch/execute",
+        service: "loreWatch",
+        namespace: "loreWatch",
+        method: "execute",
+        invocation: { kind: "direct" },
+        parameters: [{ name: "command", wire: "command", source: "json", codec: watchCommandCodec }],
+        result: watchStatusCodec
+      }]
+    };
+
+    function WatchButton(props) {
+      var execute = props.execute;
+      var t = props.t;
+      var stateHook = react.useState({ status: null, busy: false, error: null });
+      var state = stateHook[0];
+      var setState = stateHook[1];
+      react.useEffect(function () {
+        var alive = true;
+        var refresh = function () {
+          execute({ action: "status" }).then(function (status) {
+            if (!alive) return;
+            setState(function (previous) { return Object.assign({}, previous, { status: status, error: null }); });
+          }).catch(function (error) {
+            if (!alive) return;
+            setState(function (previous) { return Object.assign({}, previous, { error: String(error && error.message || error) }); });
+          });
+        };
+        refresh();
+        var timer = setInterval(refresh, 2000);
+        return function () { alive = false; clearInterval(timer); };
+      }, [execute]);
+      var running = Boolean(state.status && state.status.running);
+      var busy = state.busy;
+      var label = busy ? t("watchBusy") : running ? t("watchStop") : t("watchStart");
+      var title = state.error || (running ? t("watchHintStop") : t("watchHintStart"));
+      var toggle = function () {
+        if (busy) return;
+        setState(function (previous) { return Object.assign({}, previous, { busy: true, error: null }); });
+        var action = running ? "stop" : "start";
+        var command = action === "start" ? { action: action, game: "auto", intervalSec: 8 } : { action: action };
+        execute(command).then(function (status) {
+          setState(function (previous) { return Object.assign({}, previous, { status: status, busy: false, error: null }); });
+        }).catch(function (error) {
+          setState(function (previous) { return Object.assign({}, previous, { busy: false, error: String(error && error.message || error) }); });
+        });
+      };
+      var children = [
+        h("span", { className: "lc-watch-dot", key: "dot" }),
+        h("span", { key: "label" }, label)
+      ];
+      if (running && state.status && state.status.ticks) {
+        children.push(h("span", { className: "lc-watch-count", key: "count" }, String(state.status.ticks)));
+      }
+      return h("button", {
+        className: "lc-watch" + (running ? " lc-watch-on" : ""),
+        type: "button",
+        "aria-label": label,
+        "aria-pressed": running,
+        title: title,
+        disabled: busy,
+        onClick: toggle
+      }, children);
+    }
+
+    var inject = ["slots", "locale", "configForms", "remote"];
 
     function apply(ctx) {
       var t = ctx.locale.bind(NS);
@@ -416,6 +515,22 @@ window.__ModuleLoader__.load({
           return h(LoreSection, Object.assign({}, props, { scope: scope, t: t, locale: ctx.locale }));
         });
       });
+      if (ctx.remote && typeof ctx.remote.$mount === "function") {
+        var mounted = ctx.remote.$mount(watchRemote);
+        ctx.effect(function () { return Promise.resolve(mounted); }, "dsh-lore-companion: mount watch remote");
+        ctx.inject(["remote.loreWatch"], function (ready) {
+          ctx.slots.inject("conversation.input.right", function () {
+            return ctx.slots.register({
+              name: "conversation.input.right",
+              id: "lore-watch-button",
+              order: 10,
+              inject: function () {
+                return { execute: ready.remote.loreWatch.execute, t: t };
+              }
+            }, WatchButton);
+          });
+        });
+      }
     }
 
     exports.apply = apply;

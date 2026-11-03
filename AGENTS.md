@@ -6,13 +6,14 @@
 
 ## 0. 当前阶段
 
-- v0.5.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch。
+- v0.5.1 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch。
 - v1 附带 DSH 设置页（client.js）和游戏内 WPF 悬浮窗（overlay/overlay.ps1）。
 - 多源检索：本地日志、BWIKI、虚空终端 Akasha MCP（akasha_search）、DSH ctx.web.search（DeepSeek Search API）。
 - 图像元素分析 v1.3 alpha：本地 `lore_vision` 已实现 composition/ui/map/semantic 启发式（实时窗口、本地图片或归档 frameId）。
 - 本地语义：mode=semantic 用 OCR 文本 + 几何做场景分类、文字块、POI 邻近标签与建议；不调用模型。
 - 帧归档：可选本地 PNG + JSON（默认关闭），`lore_status` 列最近帧，`lore_vision` 可复分析；VLM/语义地图仍在 ROADMAP.md。
-- v0.5.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
+- v0.5.1 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
+- 主界面：输入框右侧 `conversation.input.right` 注册「开始记录」胶囊，经 `lib/watch-remote.js` 调 watcher；不依赖设置页。
 - 只读；不注入输入、不读游戏内存、不改游戏文件、不抢焦点、不上传截图或日志。远程检索只发 query/world 等必要参数。
 - 需要子智能体时统一用 **dsh-opencode-go / minimax-m3.1-flash**。插件 v1 不内置子智能体或 LLM 调用。
 
@@ -83,6 +84,7 @@
       lib/watcher.js       显式后台轮询（start/stop/status，不自动启动）
       lib/tools/vision.js  lore_vision 工具（实时/本地图片/frameId + 附件）
       lib/tools/watch.js   lore_watch 工具（后台轮询控制）
+      lib/watch-remote.js  Host Typert remote：主界面按钮 start/stop/status
       lib/narrate.js      分场景、关键句、brief、prompt
       lib/render.js       工具结果的简洁文本渲染
       lib/overlay.js      WPF 悬浮窗进程管理 + state 文件
@@ -258,7 +260,8 @@ Python 测试：
 - 多源：test/sources.test.mjs 覆盖 Akasha MCP JSON-RPC/解析、WebSource 映射、lore_query 四路 fan-out。
 - 视觉：test/vision.test.mjs 覆盖本地图片/frameId/实时参数/semantic OCR/禁用/坏路径；engine/tests/test_vision.py 覆盖合成图构图/UI/map/semantic 和 analyze_image 协议。
 - 帧归档：test/frames.test.mjs 覆盖保存/列表/读取/prune/禁用；真实 e2e 见 scripts/vision-e2e.mjs。
-- 后台记录：test/watch.test.mjs 覆盖显式启动、捕获/重复/跳过/空/错误计数、停止、禁用和重复启动；真实游戏连续记录仍需人工验收。
+- 后台记录：test/watch.test.mjs 覆盖显式启动、捕获/重复/跳过/空/错误计数、停止、禁用和重复启动；test/watch-remote.test.mjs 覆盖 remote 契约；真实游戏连续记录仍需人工验收。
+- 主界面按钮：client.js 注册 `conversation.input.right`，经 `remote.loreWatch` 执行；完全重启 DSH 后验收实际渲染。
 - 真实游戏人工验收：两款各切无边框，站到有说话人+正文的对话前；lore_status preview 看裁剪和 OCR；连续记 5–10 句；遮挡测试；10 分钟实录；lore_query 用特征台词找回上下文；lore_narrate 出 brief 并让主模型写解说。
 - 质量门槛：10 张真实对话截图，字符准确率 CER >=90%。低于门槛先调预处理/模型，不宣称 v1 完成。
 
@@ -298,6 +301,7 @@ Python 测试：
 - [ ] lore_vision 能在本地图片/实时窗口/归档 frameId 上返回构图、UI 面板、地图候选、语义场景/文字块与可选标注图，且不上传。
 - [ ] 帧归档默认关闭；开启后保存 PNG+JSON，受 maxFrames/retentionDays 限制。
 - [ ] lore_watch 只在显式 start 后轮询，stop/dispose 能停止；重复/空/遮挡/错误状态可查，不自动向 agent 注入通知。
+- [ ] 输入框右侧「开始记录」胶囊能启动/停止后台记录，按钮状态与 lore_watch 一致。
 - [ ] DSH 设置页/悬浮窗使用 DSH 暗色表面、细边框、蓝色强调与状态胶囊；插件列表显示自定义 icon。
 - [ ] Node/Python 单测、工具契约、只读静态检查、agents-doc 检查通过。
 - [ ] 10 张真实截图 CER >=90% 记录在 README。

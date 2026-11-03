@@ -12,7 +12,10 @@ UI_LINE = re.compile(
     re.IGNORECASE,
 )
 UID_RE = re.compile(r"^UID[:：]?\s*\d{4,}$", re.IGNORECASE)
+UID_LIKE_RE = re.compile(r"^[A-Z][:：]?\s*\d{5,}$", re.IGNORECASE)
+UI_STAT = re.compile(r"^(?:Lv\.?\s*\d+|\d+\s*/\s*\d+|\d{1,3}%|Enter|E|Esc|F|Q|Tab|Shift|Ctrl|Alt|Space|鼠标左键|鼠标右键)$", re.IGNORECASE)
 SENTENCE_ENDS = ("。", "！", "？", ".", "!", "?", "…")
+LOW_CONF_SHORT_SCORE = 0.7
 
 
 class OcrError(RuntimeError):
@@ -236,9 +239,13 @@ def dialogue_like(utterances: list[dict], region, frame_width: int, frame_height
         pieces.extend(part.strip() for part in str(item.get("text") or "").split("\n"))
     if len(pieces) > 8:
         return False
-    cleaned = [piece for piece in pieces if piece and not UI_LINE.match(piece)]
+    cleaned = [piece for piece in pieces if piece and not UI_LINE.match(piece) and not UI_STAT.match(piece)]
     text = "\n".join(cleaned).strip()
-    if len(text) < 2 or len(text) > 300:
+    if len(text) < 4 or len(text) > 300:
+        return False
+    if not any(piece.endswith(SENTENCE_ENDS) or len(piece) >= 6 for piece in cleaned):
+        return False
+    if all(piece.isascii() for piece in cleaned) and max((len(piece) for piece in cleaned), default=0) <= 20:
         return False
     if frame_width > 0 and (right - left) < frame_width * 0.18:
         return False
@@ -254,7 +261,12 @@ def extract_dialogue(lines: list[dict], image_width: int) -> dict:
     filtered = []
     for line in lines:
         text = str(line.get("text") or "").strip()
-        if not text or UID_RE.match(text):
+        score = float(line.get("score") or 0)
+        if not text or UID_RE.match(text) or UID_LIKE_RE.match(text):
+            continue
+        # Short, low-confidence OCR is mostly UI noise such as "网网网" or
+        # a misread UID; keep high-confidence short names and real lines.
+        if len(text) <= 6 and score < LOW_CONF_SHORT_SCORE:
             continue
         filtered.append(line)
     right_edge = image_width * 0.68
@@ -267,12 +279,17 @@ def extract_dialogue(lines: list[dict], image_width: int) -> dict:
     index = 0
     if len(main) >= 2:
         first = main[0]
+        second = main[1]
         first_text = str(first["text"]).strip()
         first_height = max(1, int(first.get("height") or 1))
         body_reference = max((int(item.get("height") or 0) for item in main[1:3]), default=first_height)
-        if len(first_text) <= 14 and not first_text.endswith(SENTENCE_ENDS):
+        # A speaker/title must sit above the next line. If the next OCR box is
+        # vertically on the same band, the first box is a wrapped body fragment,
+        # not a speaker ("快走快走" was the real failure).
+        first_bottom = int(first.get("bottom") or 0)
+        second_top = int(second.get("top") or 0)
+        if first_bottom <= second_top + 4 and len(first_text) <= 14 and not first_text.endswith(SENTENCE_ENDS):
             if first_height >= body_reference * 0.9:
-                second = main[1]
                 second_text = str(second["text"]).strip()
                 second_height = int(second.get("height") or 1)
                 if len(second_text) <= 20 and second_height <= first_height * 0.78 and not second_text.endswith(SENTENCE_ENDS):
@@ -290,7 +307,7 @@ def extract_dialogue(lines: list[dict], image_width: int) -> dict:
     choices = []
     for line in choice_lines:
         value = str(line["text"]).strip()
-        if value and value not in choices:
+        if value and not UI_STAT.match(value) and not UID_RE.match(value) and not UID_LIKE_RE.match(value) and value not in choices:
             choices.append(value)
     return {
         "speaker": speaker,

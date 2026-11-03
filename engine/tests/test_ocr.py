@@ -58,6 +58,16 @@ def test_dialogue_like_accepts_speaker_and_body():
     assert ocr.dialogue_like(utterances, (200, 1000, 2300, 1300), 2560, 1440) is True
 
 
+def test_dialogue_like_rejects_character_screen_stats():
+    utterances = [{"text": "Lv.90"}, {"text": "22988/22988"}, {"text": "73%"}]
+    assert ocr.dialogue_like(utterances, (52, 924, 2508, 1440), 2560, 1440) is False
+
+
+def test_dialogue_like_rejects_name_only_frame():
+    utterances = [{"text": "奥黛塔"}]
+    assert ocr.dialogue_like(utterances, (69, 976, 2491, 1440), 2560, 1440) is False
+
+
 def test_extract_dialogue_splits_speaker_title_body_and_choices():
     lines = [
         {"text": "关于至冬", "score": 0.985, "left": 1702, "top": 0, "right": 1892, "bottom": 41, "height": 41},
@@ -85,3 +95,27 @@ def test_extract_dialogue_treats_small_top_line_as_title():
     assert result["speaker"] is None
     assert result["speakerTitle"] == "冒险家协会接待员"
     assert result["text"] == "这里是冒险家协会总部。\n可以来总部进行咨询。"
+
+
+def test_extract_dialogue_drops_low_confidence_noise():
+    lines = [
+        {"text": "派家", "score": 0.5882, "left": 1101, "top": 0, "right": 1190, "bottom": 24, "height": 24},
+        {"text": "零食不算啦，嘿嘿嘿。", "score": 0.9888, "left": 450, "top": 49, "right": 1823, "bottom": 93, "height": 44},
+        {"text": "D:125578", "score": 0.9561, "left": 2156, "top": 242, "right": 2290, "bottom": 264, "height": 22},
+    ]
+    result = ocr.extract_dialogue(lines, 2560)
+    assert result["speaker"] is None
+    assert result["text"] == "零食不算啦，嘿嘿嘿。"
+    assert result["choices"] == []
+
+
+def test_extract_dialogue_does_not_treat_wrapped_body_as_speaker():
+    lines = [
+        {"text": "以家", "score": 0.5968, "left": 1588, "top": 0, "right": 1769, "bottom": 39, "height": 39},
+        {"text": "快走快走", "score": 0.9888, "left": 206, "top": 99, "right": 527, "bottom": 179, "height": 80},
+        {"text": "我想吃冰淇淋了！要大份的那种。", "score": 0.9908, "left": 593, "top": 103, "right": 2332, "bottom": 176, "height": 73},
+    ]
+    result = ocr.extract_dialogue(lines, 2560)
+    assert result["speaker"] is None
+    assert "快走快走" in result["text"]
+    assert "我想吃冰淇淋" in result["text"]

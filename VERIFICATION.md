@@ -14,17 +14,17 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 
 命令：node --test
 
-结果：57 / 57 通过。
+结果：60 / 60 通过。
 
-覆盖：config（volatile + watch）、text/dedupe、store/query、narrate、wiki mock、tool-contract（7 个工具）、overlay manager、client bundle 注册、client 渲染树、Akasha MCP 解析/调用、WebSource 映射、lore_query 四源 fan-out、lore_vision 本地图片/frameId/实时参数/semantic OCR、帧归档保存/列表/读取/prune、capture frameId、lore_watch 启动/计数/停止/禁用/重复启动、readonly、agents-doc、query 默认 all。
+覆盖：config（volatile + watch）、text/dedupe、store/query、narrate、wiki mock、tool-contract（7 个工具）、overlay manager、client bundle 注册、client 渲染树、Akasha MCP 解析/调用、WebSource 映射、lore_query 四源 fan-out、lore_vision 本地图片/frameId/实时参数/semantic OCR、帧归档保存/列表/读取/prune、capture frameId、lore_watch 启动/计数/停止/禁用/重复启动、watch remote 契约、readonly、agents-doc、query 默认 all。
 
 ### Python 测试
 
 命令：<engine venv>/Scripts/python.exe -m pytest engine/tests -q
 
-结果：22 / 22 通过。
+结果：26 / 26 通过。
 
-覆盖：windows 纯函数、region 合成图、OCR 合成中文图与说话人拆分、真实对话框说话人/头衔/正文/选项拆分、UI 噪声拒绝、protocol ping/非法请求/无窗口错误、vision 合成图构图/UI/map/semantic、analyze_image 协议。
+覆盖：windows 纯函数、region 合成图、OCR 合成中文图与说话人拆分、真实对话框说话人/头衔/正文/选项拆分、UI 噪声拒绝、protocol ping/非法请求/无窗口错误、vision 合成图构图/UI/map/semantic、analyze_image 协议、菜单/属性截图拒绝、低置信度短文本过滤。
 
 ### 引擎自举与预热
 
@@ -61,17 +61,26 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 - lore_narrate：返回 3 行 / 1 场景 / brief / prompt；prompt 包含不剧透约束。
 - 安装到 lore-dev profile 后，从安装目录 import + apply 成功，依赖解析正常。
 
-### 后台记录 v0.5.0
+### 后台记录 v0.5.1
 
 - `lib/watcher.js`：显式 start/stop/status；启动先抓一次，再按 2..300 秒轮询；不自动启动。
-- 单元测试：fake capture 覆盖 captured/duplicate/skipped/empty/error、停止后不再 tick、禁用 start 拒绝、重复 start 拒绝、interval 下限 2 秒；57/57 通过。
+- 单元测试：fake capture 覆盖 captured/duplicate/skipped/empty/error、停止后不再 tick、禁用 start 拒绝、重复 start 拒绝、interval 下限 2 秒；60/60 通过。
 - 复用 capture 管线，因此前台/遮挡/黑帧/去重/日志/悬浮窗/帧归档与 `lore_capture` 一致；不上传、不调用模型。
 - `lore_status` 返回 `watch`；`lore_watch status` 返回 ticks/captured/duplicates/skipped/empty/errors/lastError。
 - 真实游戏长跑（连续记录、切图、暂停恢复）尚未验收。
 
+### 真机测试与修复 v0.5.1
+
+- 2026-11-03 原神真实窗口（YuanShen.exe，2560×1440）已启动；`selftest` 识别窗口和 OCR ready。
+- DSH 前台时 `lore_capture` 正确拒绝 OCCLUDED（遮挡 69.45%）；切到游戏后 `lore_watch`（旧 v0.5.0）3 秒轮询抓到 5 条，日志含派蒙「零食不算啦，嘿嘿嘿……」等真实台词。
+- 暴露的问题：首条 `网网网`（score 0.5229）被当对话；`快走快走` 与正文同一排却被当说话人；属性/菜单截图（`Lv.90`、`22988/22988`、`Enter`）也会被当成对话。
+- 修复：短文本低于 0.70 过滤；UID/属性/菜单噪声过滤；说话人必须位于正文上方；`dialogue_like` 要求有意义文本；新增 Python 回归测试。修复后需重启 DSH 重新抓取验收。
+- 同时修复 `lore_status` 的 `previewError:null`、`lore_overlay` 的 `pid:null/scriptPath/lastError`、`lore_watch` 的 undefined window 参数。
+
 ### DSH 设置页与悬浮窗
 
 - client bundle：`client.js` 通过假 ModuleLoader 注册 `plugins.bundle.config`（key=dsh-lore-companion）、locale `loreCompanion` 和 `configForms.get('lore-companion')`；测试通过。
+- 主界面启动按钮：`client.js` 通过 `conversation.input.right` slot 注册胶囊按钮，经 `remote.loreWatch` 调 `lib/watch-remote.js` 的 `execute`；按钮在启动后变绿并显示「停止记录」。契约测试通过；桌面实际渲染待完全重启确认。
 - Config 已改为 `.volatile()`；`resolveConfig` 能解包 volatile，设置页可编辑 row config。
 - 悬浮窗：重做后的 WPF 预览在 2560x1440 屏幕上以 480x220 显示在右上（日志：showing at 1199,28 size 480x220；source initialized），截图见 docs/preview-overlay.png；带左侧蓝轨、图标、绿色状态胶囊、金色说话人 badge、选项 chip。
 - 悬浮窗 manager：spawn 返回 pid、status running、hide/dispose 成功；缺脚本时返回可读错误。
@@ -118,6 +127,7 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 
 - 图像元素分析 v1.3 alpha 已实现并出现在工具列表：本地 composition/ui/map 启发式、实时/本地图片、可选标注图。
 - v0.3.0 帧归档已实现（默认关闭）：PNG+JSON、frameId、retention；剩余：语义地图、VLM、更强构图建议；见 ROADMAP.md。
+- v0.5.1 增加主界面「开始记录」胶囊与真机 OCR 噪声过滤。
 
 ## 待人工完成
 
@@ -125,6 +135,7 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 
 - [ ] 桌面版插件 UI 安装 `D:/path/to/dsh-lore-companion`、启用并完全重启；确认插件列表显示「旅途记录仪」标题/描述/自定义 icon。
 - [ ] 真实游戏运行 `lore_watch start` 连续记录 2–3 分钟，再 stop/status，确认重复/遮挡/切图行为与日志一致。
+- [ ] 完全重启 DSH 后确认输入框右侧出现「开始记录」胶囊；点击开始/停止，悬浮窗和日志同步。
 - [ ] 打开 bundle 设置页，确认 hero/分组卡片/switch/知识源/视觉分析/帧归档字段的实际渲染；保存后重启生效。
 - [ ] 安装后 `lore_status` 的 `sources.web.available=true`，`lore_query` 实际走通 DeepSeek Search；Akasha 实际返回 pathHash。
 - [ ] 新会话确认 `lore_vision` 工具出现；用游戏窗口跑一次实时 composition/ui/map，检查标注图与遮挡检查。

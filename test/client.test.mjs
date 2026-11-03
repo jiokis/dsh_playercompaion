@@ -46,7 +46,7 @@ test('client bundle registers the DSH plugin config page', async () => {
   }
   await import('../client.js')
   exportsValue.apply(ctx)
-  assert.deepEqual(exportsValue.inject, ['slots', 'locale', 'configForms'])
+  assert.deepEqual(exportsValue.inject, ['slots', 'locale', 'configForms', 'remote'])
   assert.equal(typeof exportsValue.apply, 'function')
   assert.equal(locales.length, 1)
   assert.equal(locales[0].namespace, 'loreCompanion')
