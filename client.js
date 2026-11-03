@@ -69,6 +69,55 @@ window.__ModuleLoader__.load({
       ".lc-watch-on .lc-watch-dot{background:#4ed89a;box-shadow:0 0 7px rgba(78,216,154,.7)}",
       ".lc-watch-count{color:var(--dsw-alias-label-tertiary,#71809a);font-size:10px;font-variant-numeric:tabular-nums;margin-left:1px}",
       ".lc-watch-slot{display:inline-flex;align-items:center;margin-left:4px}",
+      ".lc-journal{display:flex;flex-direction:column;gap:14px;padding:18px 22px 28px;max-width:1120px;margin:0 auto;color:var(--dsw-alias-label-primary,#e8ecf4);font-size:13px;line-height:1.6}",
+      ".lc-j-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}",
+      ".lc-j-title{font-size:20px;font-weight:650;letter-spacing:-.02em}",
+      ".lc-j-sub{font-size:11px;color:var(--dsw-alias-label-tertiary,#71809a);margin-top:2px}",
+      ".lc-j-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}",
+      ".lc-j-select,.lc-j-input{height:30px;border-radius:8px;border:1px solid var(--dsw-alias-border-l2,#2a3140);background:var(--dsw-alias-bg-layer-2,#171a20);color:var(--dsw-alias-label-primary,#e8ecf4);padding:0 9px;font:inherit;font-size:12px;outline:none}",
+      ".lc-j-input{min-width:190px}",
+      ".lc-j-btn{height:30px;border-radius:8px;border:1px solid var(--dsw-alias-border-l2,#2a3140);background:rgba(255,255,255,.035);color:#aab6ca;padding:0 11px;font:inherit;font-size:11.5px;cursor:pointer}",
+      ".lc-j-btn:hover{border-color:#5b7cff;color:#e8ecf4}",
+      ".lc-j-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}",
+      ".lc-j-stat{border:1px solid var(--dsw-alias-border-l2,#2a3140);border-radius:11px;background:var(--dsw-alias-bg-layer-2,#171a20);padding:11px 13px}",
+      ".lc-j-stat b{display:block;font-size:21px;line-height:1.2;font-weight:650;color:#dce6ff}",
+      ".lc-j-stat span{font-size:10.5px;color:#71809a}",
+      ".lc-j-tabs{display:flex;gap:18px;border-bottom:1px solid var(--dsw-alias-border-l2,#2a3140)}",
+      ".lc-j-tab{background:none;border:none;border-bottom:2px solid transparent;color:#8a94a6;padding:0 0 8px;font:inherit;font-size:12px;cursor:pointer}",
+      ".lc-j-tab.active{color:#cfe0ff;border-bottom-color:#6f8dff}",
+      ".lc-j-grid{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:12px}",
+      ".lc-j-card{border:1px solid var(--dsw-alias-border-l2,#2a3140);border-radius:12px;background:var(--dsw-alias-bg-layer-2,#171a20);padding:13px 14px}",
+      ".lc-j-card h3{margin:0 0 9px;font-size:12px;font-weight:600;color:#cbd6e8}",
+      ".lc-j-chars{display:flex;flex-wrap:wrap;gap:7px}",
+      ".lc-j-char{display:flex;align-items:center;gap:6px;border:1px solid #2a3140;border-radius:999px;background:rgba(255,255,255,.025);padding:4px 9px;color:#c8d4e6;font-size:11.5px;cursor:pointer}",
+      ".lc-j-char:hover{border-color:#5b7cff;color:#fff}",
+      ".lc-j-char b{font-weight:600}.lc-j-char em{color:#71809a;font-style:normal;font-size:10px}",
+      ".lc-j-rel{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.045)}",
+      ".lc-j-rel:last-child{border-bottom:none}.lc-j-rel-name{flex:none;max-width:44%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#c8d4e6}",
+      ".lc-j-rel-bar{flex:1;height:5px;border-radius:3px;background:#222a36;overflow:hidden}",
+      ".lc-j-rel-bar i{display:block;height:100%;background:linear-gradient(90deg,#4b6cff,#8fe3b0);border-radius:3px}",
+      ".lc-j-rel em{font-style:normal;font-size:10px;color:#71809a;min-width:28px;text-align:right}",
+      ".lc-j-events{display:flex;flex-direction:column;gap:8px}",
+      ".lc-j-event{border:1px solid #2a3140;border-radius:10px;padding:9px 11px;background:rgba(255,255,255,.018);cursor:pointer}",
+      ".lc-j-event:hover{border-color:#4b6cff;background:rgba(75,108,255,.055)}",
+      ".lc-j-event-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline}",
+      ".lc-j-event-title{font-size:12px;color:#e2e9f5;font-weight:550;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+      ".lc-j-event-time{font-size:9.5px;color:#647086;flex:none}",
+      ".lc-j-event-sum{font-size:11px;color:#8d99ad;margin-top:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}",
+      ".lc-j-speakers{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}.lc-j-speaker{font-size:9.5px;color:#9fb6e8;background:rgba(75,108,255,.1);border-radius:999px;padding:1px 6px}",
+      ".lc-j-lines{display:flex;flex-direction:column;gap:0}",
+      ".lc-j-group{border-left:1px solid #2b3444;padding-left:14px;margin-left:3px;padding-bottom:10px}",
+      ".lc-j-group-head{display:flex;align-items:center;gap:8px;padding:8px 0 5px;color:#9db7ff;font-size:11px}",
+      ".lc-j-group-head b{font-weight:600;color:#cfe0ff}.lc-j-group-head time{color:#657286;font-size:9.5px}",
+      ".lc-j-line{display:flex;gap:9px;padding:6px 8px;border-radius:7px}",
+      ".lc-j-line:hover{background:rgba(255,255,255,.025)}",
+      ".lc-j-line-speaker{flex:none;width:72px;text-align:right;font-size:11.5px;color:#e8c47a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+      ".lc-j-line-main{min-width:0;flex:1}.lc-j-line-text{font-size:13px;color:#e1e8f3;white-space:pre-wrap;overflow-wrap:anywhere}",
+      ".lc-j-line-meta{font-size:9px;color:#5f6a7b;margin-top:2px}",
+      ".lc-j-choice{display:inline-block;margin:5px 5px 0 0;font-size:10.5px;color:#a9b8d6;border:1px solid #2c3647;border-radius:6px;padding:2px 7px}",
+      ".lc-j-empty{color:#71809a;text-align:center;padding:40px 10px;font-size:12px}",
+      ".lc-j-error{color:#f09aa6;font-size:12px}",
+      "@media (max-width:760px){.lc-j-stats{grid-template-columns:repeat(2,1fr)}.lc-j-grid{grid-template-columns:1fr}.lc-j-line-speaker{width:58px}}",
       "@media (max-width:640px){.lc-grid{grid-template-columns:1fr}.lc-hero{padding:14px}}"
     ].join("");
 
@@ -448,6 +497,240 @@ window.__ModuleLoader__.load({
         result: watchStatusCodec
       }]
     };
+    var journalCodec = {
+      mode: "strict",
+      typeSymbol: "dsh-lore-companion#JournalSnapshot",
+      schema: { parse: function (value) { return value; } },
+      create: function () { return { parse: function (value) { return value; } }; }
+    };
+    var journalRemote = {
+      package: "dsh-lore-companion",
+      descriptors: [{
+        id: "dsh-lore-companion#loreJournal/execute",
+        service: "loreJournal",
+        namespace: "loreJournal",
+        method: "execute",
+        invocation: { kind: "direct" },
+        parameters: [{ name: "command", wire: "command", source: "json", codec: watchCommandCodec }],
+        result: journalCodec
+      }]
+    };
+
+    function fmtClock(value) {
+      try {
+        var date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
+        return date.toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
+      } catch (error) { return ""; }
+    }
+
+    function fmtDay(value) {
+      try {
+        var date = new Date(value);
+        if (Number.isNaN(date.getTime())) return "";
+        return date.toLocaleDateString("zh-CN", { month: "2-digit", day: "2-digit" });
+      } catch (error) { return ""; }
+    }
+
+    function JournalView(props) {
+      var execute = props.execute;
+      var invoke = function (command) {
+        return Promise.resolve(execute(command)).then(function (result) {
+          if (result && typeof result === "object" && result.ok === false) {
+            throw new Error(result.error && (result.error.message || result.error.code) || "journal remote failed");
+          }
+          return result && typeof result === "object" && Object.prototype.hasOwnProperty.call(result, "value") ? result.value : result;
+        });
+      };
+      var gameHook = react.useState("genshin");
+      var game = gameHook[0];
+      var setGame = gameHook[1];
+      var snapHook = react.useState(null);
+      var snapshot = snapHook[0];
+      var setSnapshot = snapHook[1];
+      var stateHook = react.useState({ loading: true, error: null });
+      var viewState = stateHook[0];
+      var setViewState = stateHook[1];
+      var tabHook = react.useState("overview");
+      var tab = tabHook[0];
+      var setTab = tabHook[1];
+      var queryHook = react.useState("");
+      var query = queryHook[0];
+      var setQuery = queryHook[1];
+      var eventHook = react.useState("");
+      var activeEvent = eventHook[0];
+      var setActiveEvent = eventHook[1];
+
+      var load = function (nextGame, nextSession) {
+        setViewState({ loading: true, error: null });
+        invoke({ action: "snapshot", game: nextGame, session: nextSession || "", limit: 900 }).then(function (result) {
+          setSnapshot(result);
+          setViewState({ loading: false, error: null });
+        }).catch(function (error) {
+          setViewState({ loading: false, error: String(error && error.message || error) });
+        });
+      };
+
+      react.useEffect(function () {
+        load("genshin", "");
+      }, []);
+
+      var gameLabel = { genshin: "原神", hsr: "星穹铁道" };
+      var gameSelect = h("select", {
+        className: "lc-j-select",
+        value: game,
+        onChange: function (event) {
+          var value = event.target.value;
+          setGame(value);
+          setActiveEvent("");
+          setQuery("");
+          load(value, "");
+        }
+      }, ["genshin", "hsr"].map(function (id) {
+        return h("option", { value: id, key: id }, gameLabel[id]);
+      }));
+
+      var sessionSelect = h("select", {
+        className: "lc-j-select",
+        value: snapshot ? snapshot.session : "",
+        onChange: function (event) { load(game, event.target.value); }
+      }, ((snapshot && snapshot.sessions) || []).map(function (item) {
+        return h("option", { value: item.session, key: item.session }, item.session + " · " + item.entries + " 句");
+      }));
+
+      var header = h("div", { className: "lc-j-head" },
+        h("div", null,
+          h("div", { className: "lc-j-title" }, "旅途记录"),
+          h("div", { className: "lc-j-sub" }, "本地 OCR · 只读 · 事件按时间间隔分段，梗概取自原文")
+        ),
+        h("div", { className: "lc-j-tools" }, gameSelect, sessionSelect,
+          h("button", { className: "lc-j-btn", type: "button", onClick: function () { load(game, snapshot ? snapshot.session : ""); } }, "刷新")
+        )
+      );
+
+      if (viewState.loading && !snapshot) {
+        return h("div", { className: "lc-journal" }, header, h("div", { className: "lc-j-empty" }, "正在读取本地记录…"));
+      }
+      if (viewState.error) {
+        return h("div", { className: "lc-journal" }, header, h("div", { className: "lc-j-error" }, "读取失败：" + viewState.error));
+      }
+
+      var stats = snapshot.stats || { lines: 0, characters: 0, events: 0, sessions: 0 };
+      var statsRow = h("div", { className: "lc-j-stats" },
+        h("div", { className: "lc-j-stat" }, h("b", null, String(stats.lines)), h("span", null, "对话行")),
+        h("div", { className: "lc-j-stat" }, h("b", null, String(stats.characters)), h("span", null, "出场人物")),
+        h("div", { className: "lc-j-stat" }, h("b", null, String(stats.events)), h("span", null, "事件段")),
+        h("div", { className: "lc-j-stat" }, h("b", null, String(stats.sessions)), h("span", null, "记录场次"))
+      );
+
+      var tabs = h("div", { className: "lc-j-tabs" },
+        h("button", { className: "lc-j-tab" + (tab === "overview" ? " active" : ""), type: "button", onClick: function () { setTab("overview"); } }, "人物与事件"),
+        h("button", { className: "lc-j-tab" + (tab === "dialogue" ? " active" : ""), type: "button", onClick: function () { setTab("dialogue"); } }, "详细对话")
+      );
+
+      if (!snapshot.entries.length) {
+        return h("div", { className: "lc-journal" }, header, statsRow, tabs,
+          h("div", { className: "lc-j-empty" }, "这个场次还没有对话记录。点主界面的「开始记录」，切到原神对话后再回来刷新。")
+        );
+      }
+
+      var charCards = h("div", { className: "lc-j-chars" }, snapshot.characters.map(function (person) {
+        return h("button", {
+          className: "lc-j-char",
+          type: "button",
+          key: person.name,
+          title: person.title || person.name,
+          onClick: function () { setQuery(person.name); setActiveEvent(""); setTab("dialogue"); }
+        }, h("b", null, person.name), h("em", null, String(person.lines)));
+      }));
+
+      var maxRel = snapshot.relationships.reduce(function (max, item) { return Math.max(max, item.events); }, 1);
+      var relations = snapshot.relationships.length
+        ? h("div", null, snapshot.relationships.map(function (item) {
+            return h("div", { className: "lc-j-rel", key: item.a + item.b },
+              h("span", { className: "lc-j-rel-name" }, item.a + " × " + item.b),
+              h("span", { className: "lc-j-rel-bar" }, h("i", { style: { width: Math.max(5, Math.round(item.events / maxRel * 100)) + "%" } })),
+              h("em", null, item.events + " 场")
+            );
+          }))
+        : h("div", { className: "lc-j-empty" }, "还没有多角色同场事件。");
+
+      var eventCards = h("div", { className: "lc-j-events" }, snapshot.events.map(function (event) {
+        return h("div", {
+          className: "lc-j-event",
+          key: event.id,
+          onClick: function () { setActiveEvent(event.id); setQuery(""); setTab("dialogue"); }
+        },
+          h("div", { className: "lc-j-event-top" },
+            h("div", { className: "lc-j-event-title" }, event.title),
+            h("div", { className: "lc-j-event-time" }, fmtDay(event.startTs) + " " + fmtClock(event.startTs))
+          ),
+          h("div", { className: "lc-j-event-sum" }, event.summary || "（无正文）"),
+          h("div", { className: "lc-j-speakers" }, event.speakers.map(function (name) {
+            return h("span", { className: "lc-j-speaker", key: name }, name);
+          }))
+        );
+      }));
+
+      var overview = h("div", null,
+        h("div", { className: "lc-j-grid" },
+          h("section", { className: "lc-j-card" }, h("h3", null, "出场人物"), charCards),
+          h("section", { className: "lc-j-card" }, h("h3", null, "人物关系 · 同场次数"), relations)
+        ),
+        h("section", { className: "lc-j-card", style: { marginTop: "12px" } },
+          h("h3", null, "事件梗概"),
+          eventCards
+        )
+      );
+
+      var needle = query.trim().toLowerCase();
+      var visibleEvents = snapshot.events.map(function (event) {
+        var lines = event.entries.filter(function (line) {
+          if (activeEvent && event.id !== activeEvent) return false;
+          if (!needle) return true;
+          return (line.text + " " + line.speaker + " " + line.speakerTitle).toLowerCase().indexOf(needle) >= 0;
+        });
+        return { event: event, lines: lines };
+      }).filter(function (group) { return group.lines.length > 0; });
+
+      var dialogue = h("div", null,
+        h("div", { className: "lc-j-tools", style: { marginBottom: "10px" } },
+          h("input", {
+            className: "lc-j-input",
+            value: query,
+            placeholder: "搜索台词 / 角色 / 头衔",
+            onChange: function (event) { setQuery(event.target.value); }
+          }),
+          activeEvent ? h("button", { className: "lc-j-btn", type: "button", onClick: function () { setActiveEvent(""); } }, "取消事件筛选") : null,
+          query ? h("button", { className: "lc-j-btn", type: "button", onClick: function () { setQuery(""); } }, "清空搜索") : null,
+          h("span", { className: "lc-j-sub" }, "共 " + visibleEvents.reduce(function (sum, group) { return sum + group.lines.length; }, 0) + " 行")
+        ),
+        visibleEvents.length ? h("div", { className: "lc-j-lines" }, visibleEvents.map(function (group) {
+          return h("div", { className: "lc-j-group", key: group.event.id },
+            h("div", { className: "lc-j-group-head" },
+              h("b", null, group.event.title),
+              h("time", null, fmtDay(group.event.startTs) + " " + fmtClock(group.event.startTs) + " · " + group.lines.length + " 行")
+            ),
+            group.lines.map(function (line) {
+              return h("div", { className: "lc-j-line", key: line.id },
+                h("div", { className: "lc-j-line-speaker" }, line.speaker || "旁白"),
+                h("div", { className: "lc-j-line-main" },
+                  h("div", { className: "lc-j-line-text" }, line.text),
+                  h("div", { className: "lc-j-line-meta" },
+                    (line.speakerTitle ? line.speakerTitle + " · " : "") + fmtClock(line.ts)
+                  ),
+                  line.choices && line.choices.length
+                    ? h("div", null, line.choices.map(function (choice, index) { return h("span", { className: "lc-j-choice", key: index }, choice); }))
+                    : null
+                )
+              );
+            })
+          );
+        })) : h("div", { className: "lc-j-empty" }, "没有匹配的台词。")
+      );
+
+      return h("div", { className: "lc-journal" }, header, statsRow, tabs, tab === "overview" ? overview : dialogue);
+    }
 
     function WatchButton(props) {
       var execute = props.execute;
@@ -565,6 +848,21 @@ window.__ModuleLoader__.load({
                 return { execute: ready.remote.loreWatch.execute, t: t };
               }
             }, WatchButton);
+          });
+        });
+        var journalMounted = ctx.remote.$mount(journalRemote);
+        ctx.effect(function () { return Promise.resolve(journalMounted); }, "dsh-lore-companion: mount journal remote");
+        ctx.inject(["remote.loreJournal"], function (ready) {
+          ctx.slots.inject("conversation.view", function () {
+            return ctx.slots.register({
+              name: "conversation.view",
+              id: "lore-journal",
+              order: 20,
+              label: function () { return "旅途"; },
+              inject: function () {
+                return { execute: ready.remote.loreJournal.execute };
+              }
+            }, JournalView);
           });
         });
       }

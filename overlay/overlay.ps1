@@ -226,6 +226,13 @@ function Update-Overlay {
 
 try {
     $script:Window.FindName('DragHandle').Add_MouseLeftButtonDown({
+        param($sender, $eventArgs)
+        # The collapse button lives inside the drag surface; do not start a drag from it.
+        $source = $eventArgs.OriginalSource
+        while ($null -ne $source) {
+            if ($source -is [System.Windows.FrameworkElement] -and $source.Name -eq 'BtnCollapse') { return }
+            try { $source = [System.Windows.Media.VisualTreeHelper]::GetParent($source) } catch { break }
+        }
         if ($script:Layout.collapsed -eq $true) { return }
         $script:Dragging = $true
         try {
@@ -236,8 +243,8 @@ try {
         } catch { } finally { $script:Dragging = $false }
     })
 } catch {}
-try { $script:Window.FindName('BtnCollapse').Add_MouseLeftButtonUp({ if ($script:Layout.panelX -ge 0) { $script:Layout.ballX = $script:Layout.panelX; $script:Layout.ballY = $script:Layout.panelY }; $script:Layout.collapsed = $true; Save-Layout }) } catch {}
-try { $script:Window.FindName('Ball').Add_MouseLeftButtonUp({ if ($script:Layout.ballX -ge 0) { $script:Layout.panelX = $script:Layout.ballX; $script:Layout.panelY = $script:Layout.ballY }; $script:Layout.collapsed = $false; Save-Layout }) } catch {}
+try { $script:Window.FindName('BtnCollapse').Add_MouseLeftButtonUp({ if ($script:Layout.panelX -ge 0) { $script:Layout.ballX = $script:Layout.panelX; $script:Layout.ballY = $script:Layout.panelY }; $script:Layout.collapsed = $true; Save-Layout; Set-Mode $true $null }) } catch {}
+try { $script:Window.FindName('Ball').Add_MouseLeftButtonUp({ if ($script:Layout.ballX -ge 0) { $script:Layout.panelX = $script:Layout.ballX; $script:Layout.panelY = $script:Layout.ballY }; $script:Layout.collapsed = $false; Save-Layout; Set-Mode $false $null }) } catch {}
 try { $script:Window.FindName('BtnShot').Add_MouseLeftButtonUp({ Send-Command 'screenshot' }) } catch {}
 try { $script:Window.FindName('BtnAnalyze').Add_MouseLeftButtonUp({ Send-Command 'vision' }) } catch {}
 try { $script:Window.FindName('BtnRead').Add_MouseLeftButtonUp({ Send-Command 'read' }) } catch {}

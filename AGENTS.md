@@ -6,14 +6,14 @@
 
 ## 0. 当前阶段
 
-- v0.6.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch。
+- v0.7.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch。
 - v1 附带 DSH 设置页（client.js）和游戏内 WPF 悬浮窗（overlay/overlay.ps1）。
 - 多源检索：本地日志、BWIKI、虚空终端 Akasha MCP（akasha_search）、DSH ctx.web.search（DeepSeek Search API）。
 - 图像元素分析 v1.3 alpha：本地 `lore_vision` 已实现 composition/ui/map/semantic 启发式（实时窗口、本地图片或归档 frameId）。
 - 本地语义：mode=semantic 用 OCR 文本 + 几何做场景分类、文字块、POI 邻近标签与建议；不调用模型。
 - 帧归档：可选本地 PNG + JSON（默认关闭），`lore_status` 列最近帧，`lore_vision` 可复分析；VLM/语义地图仍在 ROADMAP.md。
-- v0.6.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
-- 主界面：会话标题栏右侧 `conversation.session.header.actions` 注册「开始记录」胶囊，经 `lib/watch-remote.js` 调 watcher；不依赖设置页。
+- v0.7.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
+- 主界面：会话标题栏右侧 `conversation.session.header.actions` 注册「开始记录」胶囊；会话顶部新增「旅途」`conversation.view`，显示人物、人物关系、事件梗概和详细对话。
 - 只读；不注入输入、不读游戏内存、不改游戏文件、不抢焦点、不上传截图或日志。远程检索只发 query/world 等必要参数。
 - 需要子智能体时统一用 **dsh-opencode-go / minimax-m3.1-flash**。插件 v1 不内置子智能体或 LLM 调用。
 
@@ -89,6 +89,8 @@
       lib/render.js       工具结果的简洁文本渲染
       lib/overlay.js      WPF 悬浮窗进程管理 + state 文件
       lib/overlay-bridge.js 悬浮窗按钮命令：截图/分析/阅读/查找
+      lib/journal.js      本地对话聚合成人物/关系/事件/详细对话快照
+      lib/journal-remote.js Typert remote：把旅途快照暴露给 client
       client.js           DSH 设置页（浏览器半侧，configForms + plugins.bundle.config）
       overlay/overlay.ps1 WPF 置顶/可拖动/可折叠悬浮窗，轮询 state.json，按钮写 command.json
               |
@@ -261,8 +263,9 @@ Python 测试：
 - 多源：test/sources.test.mjs 覆盖 Akasha MCP JSON-RPC/解析、WebSource 映射、lore_query 四路 fan-out。
 - 视觉：test/vision.test.mjs 覆盖本地图片/frameId/实时参数/semantic OCR/禁用/坏路径；engine/tests/test_vision.py 覆盖合成图构图/UI/map/semantic 和 analyze_image 协议。
 - 帧归档：test/frames.test.mjs 覆盖保存/列表/读取/prune/禁用；真实 e2e 见 scripts/vision-e2e.mjs。
+- 旅途视图：test/journal.test.mjs 覆盖事件分段、人物统计、同场关系与命令契约；真实 DSH 视图渲染仍需人工验收。
 - 后台记录：test/watch.test.mjs 覆盖显式启动、捕获/重复/跳过/空/错误计数、停止、禁用和重复启动；test/watch-remote.test.mjs 覆盖 remote 契约；真实游戏连续记录仍需人工验收。
-- 主界面按钮：client.js 注册 `conversation.session.header.actions`，经 `remote.loreWatch` 执行；刷新/重启后验收实际渲染。
+- 主界面按钮：client.js 注册 `conversation.session.header.actions`，经 `remote.loreWatch` 执行；`conversation.view` 注册「旅途」，经 `remote.loreJournal` 读取 snapshot；刷新/重启后验收实际渲染。
 - 真实游戏人工验收：两款各切无边框，站到有说话人+正文的对话前；lore_status preview 看裁剪和 OCR；连续记 5–10 句；遮挡测试；10 分钟实录；lore_query 用特征台词找回上下文；lore_narrate 出 brief 并让主模型写解说。
 - 质量门槛：10 张真实对话截图，字符准确率 CER >=90%。低于门槛先调预处理/模型，不宣称 v1 完成。
 
