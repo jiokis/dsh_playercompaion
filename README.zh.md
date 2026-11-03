@@ -12,8 +12,8 @@
 
 ## 当前状态
 
-- v0.7.6 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch。
-- 自动测试：Node 65 项、Python 28 项全部通过。
+- v0.8.0 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch。
+- 自动测试：Node 66 项、Python 28 项全部通过。
 - 已实测：uv 自举（缓存命中）、DXcam 抓屏、合成中文图 OCR（99.7% 置信度）、真实窗口（Windows 设置）抓屏 + OCR、lore_status 端到端。
 - BWIKI 实测：原神「派蒙」、星铁「三月七」都能搜到并写入本地缓存（各 3 页），redirect 跟随与去导航清洗已生效。
 - 虚空终端实测：Akasha MCP 的 `initialize` + `akasha_search` 返回「凯瑟琳」5 个 pathHash，正文片段解析正确。
@@ -22,7 +22,7 @@
 - 原神无边框实测：DXcam 抓屏成功；书页「召回 / UID」和桌面多窗口误抓已被 UI/前台检查拦下。
 - **原神真实对话已通过**：凯瑟琳 / 冒险家协会接待员 / 正文 / 右侧选项都能拆出；JSONL 写入、第二次抓取 duplicate+seen、按角色名查询、lore_narrate 素材都跑通。
 - DSH 设置页：`client.js` 注册 `plugins.bundle.config`，`configForms` 绑定 `lore-companion`；bundle 注册测试通过。UI 改成 DSH 风格：hero、状态 chip、分组卡片、开关、粘性保存条。
-- 游戏内悬浮窗：v0.7.6 可拖动、可折叠成圆球；带状态胶囊、说话人 badge、正文和截图/分析/阅读/查找按钮（`docs/preview-overlay.png`）；manager spawn/hide/dispose 冒烟通过。
+- 游戏内悬浮窗：v0.8.0 可拖动、可折叠成圆球；带状态胶囊、说话人 badge、正文和截图/分析/阅读/查找按钮（`docs/preview-overlay.png`）；manager spawn/hide/dispose 冒烟通过。
 - **v1.3 视觉分析 alpha 已落地**：`lore_vision` 本地分析构图/UI/地图启发式，支持实时游戏窗口或本地 PNG/JPG；真实截图端到端通过，标注图见 `docs/preview-vision.png`。
 - **v0.3.0 帧归档**：可选保存窗口 PNG + JSON（默认关闭），`lore_status` 列出最近帧，`lore_vision` 可用 `frameId` 复分析；带 maxFrames/retentionDays 清理。
 - **v0.4.0 本地语义**：`mode=semantic` 用 OCR 文本 + 几何做场景分类（对话/地图/菜单/场景）、文字块、POI 邻近标签和构图/可读性建议；真实截图 scene=dialogue、textBlocks=3。
@@ -149,7 +149,7 @@ lore_query 默认 `scope=all`，同时查四路；网络源失败只加 warning�
 
     pnpm pack
 
-生成 dsh-lore-companion-0.7.6.tgz，可在插件 UI 用本地压缩包安装。
+生成 dsh-lore-companion-0.8.0.tgz，可在插件 UI 用本地压缩包安装。
 
 ## 首次自举与镜像
 
@@ -350,3 +350,10 @@ DSH 会话顶部新增「旅途」视图（在「对话 / 轨迹」后面）：
 - 场次切换：原神 / 星穹铁道、每个 watch-YYYYMMDD 场次；只读本地 JSONL，不调用模型、不上传。
 - 事件梗概是抽取式：取事件最早两句原文，不做语义编造；人物关系按同场事件计数。
 - 实现：lib/journal.js 聚合快照，lib/journal-remote.js 经 Typert 暴露，client 注册 conversation.view。
+
+## 旅途 2.0
+
+- 人物关系图谱：环形 SVG，节点大小按出场行数，连线粗细按同场事件次数；点节点直接筛对话。
+- 事件时间线：竖向轨道 + 事件节点，保留时间、角色和抽取式梗概。
+- 详细对话：说话人头像色块、搜索高亮、逐句复制、事件分组。
+- 导出：一键下载 Markdown 或 JSON，数据只在本地生成。

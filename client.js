@@ -117,7 +117,16 @@ window.__ModuleLoader__.load({
       ".lc-j-choice{display:inline-block;margin:5px 5px 0 0;font-size:10.5px;color:#a9b8d6;border:1px solid #2c3647;border-radius:6px;padding:2px 7px}",
       ".lc-j-empty{color:#71809a;text-align:center;padding:40px 10px;font-size:12px}",
       ".lc-j-error{color:#f09aa6;font-size:12px}",
-      "@media (max-width:760px){.lc-j-stats{grid-template-columns:repeat(2,1fr)}.lc-j-grid{grid-template-columns:1fr}.lc-j-line-speaker{width:58px}}",
+      ".lc-j-graph{width:100%;height:auto;min-height:250px;border:1px solid #242c39;border-radius:10px;background:radial-gradient(circle at 50% 42%,rgba(75,108,255,.12),rgba(10,13,19,.2) 62%);margin:2px 0 8px}",
+      ".lc-j-node{cursor:pointer}.lc-j-node circle{transition:filter .15s,stroke .15s;stroke:#0d1119;stroke-width:2}.lc-j-node:hover circle{filter:brightness(1.2);stroke:#fff}.lc-j-node text{fill:#aebbd0;font-size:11px;font-family:inherit;pointer-events:none}",
+      ".lc-j-timeline{position:relative;display:flex;flex-direction:column;gap:2px;margin-top:2px}",
+      ".lc-j-tl-item{display:flex;gap:10px;align-items:stretch}.lc-j-tl-rail{position:relative;width:14px;flex:none}.lc-j-tl-rail:before{content:\"\";position:absolute;left:6px;top:0;bottom:0;width:1px;background:#2b3444}.lc-j-tl-dot{position:absolute;left:2px;top:15px;width:9px;height:9px;border-radius:50%;background:#4b6cff;box-shadow:0 0 0 4px rgba(75,108,255,.12)}.lc-j-tl-item:last-child .lc-j-tl-rail:before{bottom:auto;height:22px}",
+      ".lc-j-tl-item .lc-j-event{flex:1;margin:4px 0}.lc-j-tl-item:last-child .lc-j-tl-dot{background:#8fe3b0;box-shadow:0 0 0 4px rgba(78,216,154,.1)}",
+      ".lc-j-avatar{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:7px;font-size:11px;font-weight:650;color:#10151d;flex:none}",
+      ".lc-j-line-speaker{width:96px;display:flex;align-items:center;justify-content:flex-end;gap:6px;padding-top:1px}.lc-j-line-name{max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;color:#e8c47a}",
+      ".lc-j-line-meta{display:flex;align-items:center;gap:9px}.lc-j-copy{margin-left:auto;opacity:0;border:1px solid #2b3444;background:transparent;color:#7f8b9f;border-radius:5px;padding:1px 5px;font:inherit;font-size:9.5px;cursor:pointer;transition:opacity .15s}.lc-j-line:hover .lc-j-copy{opacity:1}.lc-j-copy:hover{color:#dce6ff;border-color:#5b7cff}",
+      ".lc-j-mark{background:rgba(232,196,122,.28);color:#ffe4a8;border-radius:3px;padding:0 1px}",
+      "@media (max-width:760px){.lc-j-stats{grid-template-columns:repeat(2,1fr)}.lc-j-grid{grid-template-columns:1fr}.lc-j-line-speaker{width:64px}.lc-j-line-name{max-width:40px}}",
       "@media (max-width:640px){.lc-grid{grid-template-columns:1fr}.lc-hero{padding:14px}}"
     ].join("");
 
@@ -532,6 +541,63 @@ window.__ModuleLoader__.load({
       } catch (error) { return ""; }
     }
 
+    function speakerColor(name) {
+      var hash = 0;
+      var text = String(name || "旁白");
+      for (var index = 0; index < text.length; index += 1) hash = (hash * 31 + text.charCodeAt(index)) % 360;
+      return "hsl(" + hash + ", 58%, 62%)";
+    }
+
+    function highlightText(text, needle) {
+      var source = String(text || "");
+      if (!needle) return source;
+      var lower = source.toLowerCase();
+      var target = String(needle).toLowerCase();
+      if (!target) return source;
+      var parts = [];
+      var cursor = 0;
+      var found = lower.indexOf(target);
+      while (found >= 0) {
+        if (found > cursor) parts.push(source.slice(cursor, found));
+        parts.push(h("mark", { className: "lc-j-mark", key: "m" + parts.length }, source.slice(found, found + target.length)));
+        cursor = found + target.length;
+        found = lower.indexOf(target, cursor);
+      }
+      if (cursor < source.length) parts.push(source.slice(cursor));
+      return parts;
+    }
+
+    function downloadText(filename, text, mime) {
+      try {
+        var blob = new Blob([text], { type: mime || "text/plain;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+      } catch (error) { /* export is best effort */ }
+    }
+
+    function journalMarkdown(snapshot, gameLabel) {
+      var label = gameLabel[snapshot.game] || snapshot.game;
+      var lines = ["# 旅途记录 · " + label, "", "场次：" + (snapshot.session || "全部") + " · 导出 " + new Date().toLocaleString("zh-CN"), "", "## 人物", ""];
+      snapshot.characters.forEach(function (person) {
+        lines.push("- " + person.name + (person.title ? "（" + person.title + "）" : "") + "：" + person.lines + " 行");
+      });
+      lines.push("", "## 人物关系", "");
+      snapshot.relationships.forEach(function (item) { lines.push("- " + item.a + " × " + item.b + "：" + item.events + " 场"); });
+      lines.push("", "## 事件", "");
+      snapshot.events.forEach(function (event) {
+        lines.push("### " + event.title, "", fmtDay(event.startTs) + " " + fmtClock(event.startTs) + " · " + event.speakers.join("、"), "", event.summary || "", "");
+        event.entries.forEach(function (line) { lines.push("- " + (line.speaker || "旁白") + "：" + line.text); });
+        lines.push("");
+      });
+      return lines.join("\n");
+    }
+
     function JournalView(props) {
       var execute = props.execute;
       var invoke = function (command) {
@@ -604,7 +670,9 @@ window.__ModuleLoader__.load({
           h("div", { className: "lc-j-sub" }, "本地 OCR · 只读 · 事件按时间间隔分段，梗概取自原文")
         ),
         h("div", { className: "lc-j-tools" }, gameSelect, sessionSelect,
-          h("button", { className: "lc-j-btn", type: "button", onClick: function () { load(game, snapshot ? snapshot.session : ""); } }, "刷新")
+          h("button", { className: "lc-j-btn", type: "button", onClick: function () { load(game, snapshot ? snapshot.session : ""); } }, "刷新"),
+          snapshot ? h("button", { className: "lc-j-btn", type: "button", onClick: function () { downloadText("旅途记录-" + (snapshot.session || snapshot.game) + ".md", journalMarkdown(snapshot, gameLabel), "text/markdown;charset=utf-8"); } }, "导出 MD") : null,
+          snapshot ? h("button", { className: "lc-j-btn", type: "button", onClick: function () { downloadText("旅途记录-" + (snapshot.session || snapshot.game) + ".json", JSON.stringify(snapshot, null, 2), "application/json;charset=utf-8"); } }, "JSON") : null
         )
       );
 
@@ -646,7 +714,7 @@ window.__ModuleLoader__.load({
 
       var maxRel = snapshot.relationships.reduce(function (max, item) { return Math.max(max, item.events); }, 1);
       var relations = snapshot.relationships.length
-        ? h("div", null, snapshot.relationships.map(function (item) {
+        ? h("div", null, snapshot.relationships.slice(0, 10).map(function (item) {
             return h("div", { className: "lc-j-rel", key: item.a + item.b },
               h("span", { className: "lc-j-rel-name" }, item.a + " × " + item.b),
               h("span", { className: "lc-j-rel-bar" }, h("i", { style: { width: Math.max(5, Math.round(item.events / maxRel * 100)) + "%" } })),
@@ -655,30 +723,80 @@ window.__ModuleLoader__.load({
           }))
         : h("div", { className: "lc-j-empty" }, "还没有多角色同场事件。");
 
-      var eventCards = h("div", { className: "lc-j-events" }, snapshot.events.map(function (event) {
-        return h("div", {
-          className: "lc-j-event",
-          key: event.id,
-          onClick: function () { setActiveEvent(event.id); setQuery(""); setTab("dialogue"); }
-        },
-          h("div", { className: "lc-j-event-top" },
-            h("div", { className: "lc-j-event-title" }, event.title),
-            h("div", { className: "lc-j-event-time" }, fmtDay(event.startTs) + " " + fmtClock(event.startTs))
-          ),
-          h("div", { className: "lc-j-event-sum" }, event.summary || "（无正文）"),
-          h("div", { className: "lc-j-speakers" }, event.speakers.map(function (name) {
-            return h("span", { className: "lc-j-speaker", key: name }, name);
-          }))
+      var graphPeople = snapshot.characters.slice(0, 10);
+      var graphNodes = graphPeople.map(function (person, index) {
+        var total = Math.max(1, graphPeople.length);
+        var angle = -Math.PI / 2 + (index * Math.PI * 2 / total);
+        var radius = 104;
+        return {
+          person: person,
+          x: 310 + Math.cos(angle) * radius,
+          y: 152 + Math.sin(angle) * radius,
+          r: 15 + Math.min(10, Math.sqrt(person.lines || 1) * 2)
+        };
+      });
+      var nodeByName = {};
+      graphNodes.forEach(function (node) { nodeByName[node.person.name] = node; });
+      var graphEdges = snapshot.relationships.filter(function (item) {
+        return nodeByName[item.a] && nodeByName[item.b];
+      });
+      var graph = graphPeople.length ? h("svg", {
+        className: "lc-j-graph",
+        viewBox: "0 0 620 304",
+        role: "img",
+        "aria-label": "人物关系图谱"
+      },
+        graphEdges.map(function (item) {
+          var left = nodeByName[item.a];
+          var right = nodeByName[item.b];
+          return h("line", {
+            key: "edge-" + item.a + item.b,
+            x1: left.x, y1: left.y, x2: right.x, y2: right.y,
+            stroke: "#6f8dff",
+            strokeWidth: 1 + Math.min(4, item.events * 0.8),
+            opacity: Math.max(0.16, Math.min(0.62, 0.12 + item.events * 0.12))
+          });
+        }),
+        graphNodes.map(function (node) {
+          var name = node.person.name;
+          return h("g", {
+            className: "lc-j-node",
+            key: "node-" + name,
+            onClick: function () { setQuery(name); setActiveEvent(""); setTab("dialogue"); }
+          },
+            h("title", null, name + " · " + node.person.lines + " 行"),
+            h("circle", { cx: node.x, cy: node.y, r: node.r, fill: speakerColor(name) }),
+            h("text", { x: node.x, y: node.y + node.r + 15, textAnchor: "middle" }, name.length > 6 ? name.slice(0, 6) + "…" : name)
+          );
+        })
+      ) : h("div", { className: "lc-j-empty" }, "还没有足够的人物数据。");
+
+      var eventCards = h("div", { className: "lc-j-timeline" }, snapshot.events.map(function (event) {
+        return h("div", { className: "lc-j-tl-item", key: event.id },
+          h("div", { className: "lc-j-tl-rail" }, h("span", { className: "lc-j-tl-dot" })),
+          h("div", {
+            className: "lc-j-event",
+            onClick: function () { setActiveEvent(event.id); setQuery(""); setTab("dialogue"); }
+          },
+            h("div", { className: "lc-j-event-top" },
+              h("div", { className: "lc-j-event-title" }, event.title),
+              h("div", { className: "lc-j-event-time" }, fmtDay(event.startTs) + " " + fmtClock(event.startTs))
+            ),
+            h("div", { className: "lc-j-event-sum" }, event.summary || "（无正文）"),
+            h("div", { className: "lc-j-speakers" }, event.speakers.map(function (name) {
+              return h("span", { className: "lc-j-speaker", key: name }, name);
+            }))
+          )
         );
       }));
 
       var overview = h("div", null,
         h("div", { className: "lc-j-grid" },
           h("section", { className: "lc-j-card" }, h("h3", null, "出场人物"), charCards),
-          h("section", { className: "lc-j-card" }, h("h3", null, "人物关系 · 同场次数"), relations)
+          h("section", { className: "lc-j-card lc-j-graph-card" }, h("h3", null, "人物关系图谱"), graph, relations)
         ),
         h("section", { className: "lc-j-card", style: { marginTop: "12px" } },
-          h("h3", null, "事件梗概"),
+          h("h3", null, "事件时间线"),
           eventCards
         )
       );
@@ -712,12 +830,22 @@ window.__ModuleLoader__.load({
               h("time", null, fmtDay(group.event.startTs) + " " + fmtClock(group.event.startTs) + " · " + group.lines.length + " 行")
             ),
             group.lines.map(function (line) {
+              var color = speakerColor(line.speaker);
               return h("div", { className: "lc-j-line", key: line.id },
-                h("div", { className: "lc-j-line-speaker" }, line.speaker || "旁白"),
+                h("div", { className: "lc-j-line-speaker" },
+                  h("span", { className: "lc-j-avatar", style: { background: color } }, (line.speaker || "旁").slice(0, 1)),
+                  h("span", { className: "lc-j-line-name" }, line.speaker || "旁白")
+                ),
                 h("div", { className: "lc-j-line-main" },
-                  h("div", { className: "lc-j-line-text" }, line.text),
+                  h("div", { className: "lc-j-line-text" }, highlightText(line.text, needle)),
                   h("div", { className: "lc-j-line-meta" },
-                    (line.speakerTitle ? line.speakerTitle + " · " : "") + fmtClock(line.ts)
+                    (line.speakerTitle ? line.speakerTitle + " · " : "") + fmtClock(line.ts),
+                    h("button", {
+                      className: "lc-j-copy",
+                      type: "button",
+                      title: "复制这句",
+                      onClick: function () { try { navigator.clipboard.writeText((line.speaker ? line.speaker + "：" : "") + line.text); } catch (error) { /* clipboard is best effort */ } }
+                    }, "复制")
                   ),
                   line.choices && line.choices.length
                     ? h("div", null, line.choices.map(function (choice, index) { return h("span", { className: "lc-j-choice", key: index }, choice); }))

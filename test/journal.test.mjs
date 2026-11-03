@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { buildJournal } from '../lib/journal.js'
 import { parseJournalCommand } from '../lib/journal-remote.js'
+import { parseCommand } from '../lib/watch-remote.js'
 
 test('journal snapshot builds events, characters and co-occurrence relations', () => {
   const entries = [
@@ -26,4 +27,11 @@ test('journal command contract defaults and validates game', () => {
   assert.deepEqual(parseJournalCommand({}), { action: 'snapshot', game: 'genshin' })
   assert.equal(parseJournalCommand({ game: 'hsr', session: 's2', limit: 10 }).limit, 20)
   assert.throws(() => parseJournalCommand({ action: 'write' }), /snapshot/)
+})
+
+test('journal is accepted by the existing watch remote codec', () => {
+  const command = parseCommand({ action: 'journal', game: 'hsr', session: 's1', limit: 300 })
+  assert.equal(command.action, 'journal')
+  assert.equal(command.game, 'hsr')
+  assert.equal(command.limit, 300)
 })

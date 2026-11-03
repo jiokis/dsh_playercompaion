@@ -8,8 +8,8 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 
 ## Status
 
-- v0.7.6 code complete: lore_status, lore_capture, lore_query, lore_narrate, lore_overlay, lore_vision, lore_watch.
-- Automated tests: 65 Node tests + 28 Python tests pass.
+- v0.8.0 code complete: lore_status, lore_capture, lore_query, lore_narrate, lore_overlay, lore_vision, lore_watch.
+- Automated tests: 66 Node tests + 28 Python tests pass.
 - Verified: uv bootstrap cache hit, DXcam capture, synthetic Chinese OCR (99.7% score), real-window capture/OCR, end-to-end lore_status.
 - BWIKI live: Genshin 派蒙 and HSR 三月七 both search, fetch, cache and return cleaned snippets; redirects are followed.
 - Akasha live: MCP initialize + akasha_search returned five 凯瑟琳 pathHashes and parsed body snippets.
@@ -20,7 +20,7 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 - v1.3 vision alpha: `lore_vision` performs local composition/UI/map heuristics on the live window or a local PNG/JPG/WebP; real-crop end-to-end passes; annotated preview at `docs/preview-vision.png`.
 - v0.3.0 frame archive: optional local window PNG + JSON (off by default), `lore_status` lists recent frames, `lore_vision` can re-analyze by `frameId`, with maxFrames/retentionDays cleanup.
 - v0.4.0 local semantics: `mode=semantic` uses OCR text + geometry for scene classification (dialogue/map/menu/scene), text blocks, nearby POI labels and composition/readability advice; real crop: scene=dialogue, textBlocks=3.
-- v0.7.6 background watch: `lore_watch` has explicit start/stop/status and reuses the capture pipeline; a **Start recording** pill now sits on the conversation header; unit tests cover start, duplicate/skip/empty/error, stop and double-start. Real-game long-run acceptance is still pending.
+- v0.8.0 background watch: `lore_watch` has explicit start/stop/status and reuses the capture pipeline; a **Start recording** pill now sits on the conversation header; unit tests cover start, duplicate/skip/empty/error, stop and double-start. Real-game long-run acceptance is still pending.
 - Star Rail real dialogue, a 10-minute session, the 10-screenshot CER gate, and a real-game watch long run are still pending.
 
 ## Tools
@@ -233,3 +233,10 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - Session switch: Genshin / Star Rail and every watch-YYYYMMDD session; local JSONL only, no model call or upload.
 - Event summaries are extractive (the first two lines of the event); relationships count shared events.
 - Implementation: lib/journal.js builds the snapshot, lib/journal-remote.js exposes it through Typert, and the client registers a conversation.view.
+
+## Journal 2.0
+
+- Character graph: radial SVG, node size by line count, edge weight by shared events; click a node to filter dialogue.
+- Event timeline: vertical rail and event nodes with time, speakers, and extractive summaries.
+- Detailed dialogue: speaker avatars/colors, search highlighting, per-line copy, grouped by event.
+- Export: local Markdown or JSON download.
