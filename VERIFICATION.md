@@ -14,17 +14,26 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 
 命令：node --test
 
-结果：60 / 60 通过。
+结果：62 / 62 通过。
 
-覆盖：config（volatile + watch）、text/dedupe、store/query、narrate、wiki mock、tool-contract（7 个工具）、overlay manager、client bundle 注册、client 渲染树、Akasha MCP 解析/调用、WebSource 映射、lore_query 四源 fan-out、lore_vision 本地图片/frameId/实时参数/semantic OCR、帧归档保存/列表/读取/prune、capture frameId、lore_watch 启动/计数/停止/禁用/重复启动、watch remote 契约、readonly、agents-doc、query 默认 all。
+覆盖：config（volatile + watch）、text/dedupe、store/query、narrate、wiki mock、tool-contract（7 个工具）、overlay manager、overlay bridge 截图/阅读命令、client bundle 注册、client 渲染树、Akasha MCP 解析/调用、WebSource 映射、lore_query 四源 fan-out、lore_vision 本地图片/frameId/实时参数/semantic OCR、帧归档保存/列表/读取/prune、capture frameId、lore_watch 启动/计数/停止/禁用/重复启动、watch remote 契约、readonly、agents-doc、query 默认 all。
 
 ### Python 测试
 
 命令：<engine venv>/Scripts/python.exe -m pytest engine/tests -q
 
-结果：27 / 27 通过。
+结果：28 / 28 通过。
 
-覆盖：windows 纯函数、region 合成图、OCR 合成中文图与说话人拆分、真实对话框说话人/头衔/正文/选项拆分、UI 噪声拒绝、protocol ping/非法请求/无窗口错误、vision 合成图构图/UI/map/semantic、analyze_image 协议、菜单/属性截图拒绝、低置信度短文本过滤。
+覆盖：windows 纯函数、region 合成图、OCR 合成中文图与说话人拆分、真实对话框说话人/头衔/正文/选项拆分、UI 噪声拒绝（血量/等级/操作提示）、protocol ping/非法请求/无窗口错误、vision 合成图构图/UI/map/semantic、analyze_image 协议、菜单/属性截图拒绝、低置信度短文本过滤。
+
+### 悬浮窗 v0.6.0
+
+- 面板可拖动，拖动期间暂停 300ms 位置重排，不再闪回原位。
+- 右上角 `—` 收起为 52px 圆球，点圆球展开；位置/折叠状态写入 `layout.json`。
+- 新排版 560x300：说话人 badge、正文、状态胶囊、底部 `截图 / 分析 / 阅读 / 查找`。
+- `阅读` 使用更宽区域与 1600px OCR；`截图` 保存 PNG；`分析` 走本地 vision；`查找` 用当前台词查四路。
+- `overlay-bridge.test.mjs` 覆盖截图与阅读命令；WPF 脚本经 PowerShell 5.1 parser 检查。
+- 预览图见 `docs/preview-overlay.png`。
 
 ### 引擎自举与预热
 
@@ -61,7 +70,7 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 - lore_narrate：返回 3 行 / 1 场景 / brief / prompt；prompt 包含不剧透约束。
 - 安装到 lore-dev profile 后，从安装目录 import + apply 成功，依赖解析正常。
 
-### 后台记录 v0.5.2
+### 后台记录 v0.6.0
 
 - `lib/watcher.js`：显式 start/stop/status；启动先抓一次，再按 2..300 秒轮询；不自动启动。
 - 单元测试：fake capture 覆盖 captured/duplicate/skipped/empty/error、停止后不再 tick、禁用 start 拒绝、重复 start 拒绝、interval 下限 2 秒；60/60 通过。
@@ -69,7 +78,7 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 - `lore_status` 返回 `watch`；`lore_watch status` 返回 ticks/captured/duplicates/skipped/empty/errors/lastError。
 - 真实游戏长跑（连续记录、切图、暂停恢复）尚未验收。
 
-### 真机测试与修复 v0.5.2
+### 真机测试与修复 v0.6.0
 
 - 2026-11-03 原神真实窗口（YuanShen.exe，2560×1440）已启动；`selftest` 识别窗口和 OCR ready。
 - DSH 前台时 `lore_capture` 正确拒绝 OCCLUDED（遮挡 69.45%）；切到游戏后 `lore_watch`（旧 v0.5.0）3 秒轮询抓到 5 条，日志含派蒙「零食不算啦，嘿嘿嘿……」等真实台词。
@@ -127,7 +136,7 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 
 - 图像元素分析 v1.3 alpha 已实现并出现在工具列表：本地 composition/ui/map 启发式、实时/本地图片、可选标注图。
 - v0.3.0 帧归档已实现（默认关闭）：PNG+JSON、frameId、retention；剩余：语义地图、VLM、更强构图建议；见 ROADMAP.md。
-- v0.5.2 增加主界面「开始记录」胶囊与真机 OCR 噪声过滤。
+- v0.6.0 增加主界面「开始记录」胶囊与真机 OCR 噪声过滤。
 
 ## 待人工完成
 

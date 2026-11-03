@@ -6,13 +6,13 @@
 
 ## 0. 当前阶段
 
-- v0.5.2 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch。
+- v0.6.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch。
 - v1 附带 DSH 设置页（client.js）和游戏内 WPF 悬浮窗（overlay/overlay.ps1）。
 - 多源检索：本地日志、BWIKI、虚空终端 Akasha MCP（akasha_search）、DSH ctx.web.search（DeepSeek Search API）。
 - 图像元素分析 v1.3 alpha：本地 `lore_vision` 已实现 composition/ui/map/semantic 启发式（实时窗口、本地图片或归档 frameId）。
 - 本地语义：mode=semantic 用 OCR 文本 + 几何做场景分类、文字块、POI 邻近标签与建议；不调用模型。
 - 帧归档：可选本地 PNG + JSON（默认关闭），`lore_status` 列最近帧，`lore_vision` 可复分析；VLM/语义地图仍在 ROADMAP.md。
-- v0.5.2 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
+- v0.6.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
 - 主界面：会话标题栏右侧 `conversation.session.header.actions` 注册「开始记录」胶囊，经 `lib/watch-remote.js` 调 watcher；不依赖设置页。
 - 只读；不注入输入、不读游戏内存、不改游戏文件、不抢焦点、不上传截图或日志。远程检索只发 query/world 等必要参数。
 - 需要子智能体时统一用 **dsh-opencode-go / minimax-m3.1-flash**。插件 v1 不内置子智能体或 LLM 调用。
@@ -32,7 +32,7 @@
 - RapidOCR / ONNXRuntime 本地推理
 - 本地 OpenCV 图像分析（构图/UI/POI 启发式）；只处理用户窗口或用户给的 imagePath
 - 本地文件读写（日志、Wiki 缓存、引擎缓存、悬浮窗 state、可选帧归档）
-- WPF 悬浮窗只做显示：置顶、鼠标穿透、WS_EX_NOACTIVATE；不改游戏、不抓输入
+- WPF 悬浮窗只做显示与本地按钮交互：置顶、可拖动/折叠、WS_EX_NOACTIVATE；按钮只写本地 command.json，不抓游戏输入、不改游戏
 
 禁止的 API / 行为：
 
@@ -88,8 +88,9 @@
       lib/narrate.js      分场景、关键句、brief、prompt
       lib/render.js       工具结果的简洁文本渲染
       lib/overlay.js      WPF 悬浮窗进程管理 + state 文件
+      lib/overlay-bridge.js 悬浮窗按钮命令：截图/分析/阅读/查找
       client.js           DSH 设置页（浏览器半侧，configForms + plugins.bundle.config）
-      overlay/overlay.ps1 WPF 置顶/穿透悬浮窗，轮询 state.json
+      overlay/overlay.ps1 WPF 置顶/可拖动/可折叠悬浮窗，轮询 state.json，按钮写 command.json
               |
               | 一行一个 JSON 请求/响应
               v
@@ -115,7 +116,7 @@
 - 引擎进程常驻，OCR 只 warmup 一次；请求串行。
 - 引擎崩溃下一次调用重建客户端；不自动重放 capture（抓屏不是幂等的）。
 - 设置页只写 row config；Config 是 .volatile()，保存后重启 DSH 才重建 runtime。
-- 悬浮窗是独立 PowerShell 进程，由 Host 的 OverlayManager 拉起；只读 state、不接触游戏。
+- 悬浮窗是独立 PowerShell 进程，由 Host 的 OverlayManager 拉起；按钮只写本地 command.json，由 Host 的 OverlayActionBridge 执行截图/分析/阅读/查找；不接触游戏。
 
 ## 4. 工具契约
 
@@ -156,7 +157,7 @@
 - 参数：action（show/hide/status，必填）、game?、position?。
 - 返回：action、enabled、running、pid、state、error、statePath、logPath。
 - show 写 state 并拉起 overlay/overlay.ps1；hide 写 visible=false；status 读 state/进程。
-- 悬浮窗只显示最近一次 capture 的 status/speaker/title/body/choices，置顶、鼠标穿透、不抢焦点。
+- 悬浮窗显示最近一次 capture 的 status/speaker/title/body/choices，置顶、不抢焦点；面板可拖动，`—` 收起为圆球。按钮支持截图保存、本地视觉分析、阅读区域 OCR、四路查找。
 
 ### lore_vision
 
@@ -256,7 +257,7 @@ Python 测试：
 - 工具契约：用宿主同版本 @deepseek-ai/dsh-tools 的 defineTool 校验 schema/output/render。
 - 只读静态检查：扫描 engine/lore_engine 和 lib，禁止输入/内存/焦点 API（GetForegroundWindow 允许）。
 - 客户端：test/client.test.mjs 用假 ModuleLoader 验证 `plugins.bundle.config` 注册、locale 与 configForms 命名空间。
-- 悬浮窗：test/overlay.test.mjs 验证 state/status/缺脚本错误；预览脚本用 overlay-shot.py 出图检查。
+- 悬浮窗：test/overlay.test.mjs 验证 state/status/缺脚本错误；test/overlay-bridge.test.mjs 验证 command 截图执行与回写；预览脚本用 overlay-shot.py 出图检查。
 - 多源：test/sources.test.mjs 覆盖 Akasha MCP JSON-RPC/解析、WebSource 映射、lore_query 四路 fan-out。
 - 视觉：test/vision.test.mjs 覆盖本地图片/frameId/实时参数/semantic OCR/禁用/坏路径；engine/tests/test_vision.py 覆盖合成图构图/UI/map/semantic 和 analyze_image 协议。
 - 帧归档：test/frames.test.mjs 覆盖保存/列表/读取/prune/禁用；真实 e2e 见 scripts/vision-e2e.mjs。
@@ -297,7 +298,7 @@ Python 测试：
 - [ ] lore_query 能按关键词/时间/会话命中；本地/BWIKI/Akasha/Web 四源可选择；断网回退缓存；无缓存不编造。
 - [ ] lore_narrate 返回 transcript/scenes/brief/prompt，且不调用 LLM。
 - [ ] DSH 插件页显示「旅途记录仪」标题/描述，设置页能编辑并保存 row config。
-- [ ] 游戏内悬浮窗置顶、鼠标穿透、不抢焦点，显示最近一次 capture。
+- [ ] 游戏内悬浮窗置顶、可拖动/折叠、不抢焦点，显示最近一次 capture；截图/分析/阅读/查找按钮可用。
 - [ ] lore_vision 能在本地图片/实时窗口/归档 frameId 上返回构图、UI 面板、地图候选、语义场景/文字块与可选标注图，且不上传。
 - [ ] 帧归档默认关闭；开启后保存 PNG+JSON，受 maxFrames/retentionDays 限制。
 - [ ] lore_watch 只在显式 start 后轮询，stop/dispose 能停止；重复/空/遮挡/错误状态可查，不自动向 agent 注入通知。

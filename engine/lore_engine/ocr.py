@@ -14,7 +14,7 @@ UI_LINE = re.compile(
 UID_RE = re.compile(r"^UID[:：]?\s*\d{4,}$", re.IGNORECASE)
 UID_LIKE_RE = re.compile(r"^[A-Z][:：]?\s*\d{5,}$", re.IGNORECASE)
 UI_STAT = re.compile(r"^(?:Lv\.?\s*\d+|\d+\s*/\s*\d+|\d{1,3}%|Enter|E|Esc|F|Q|Tab|Shift|Ctrl|Alt|Space|鼠标左键|鼠标右键)$", re.IGNORECASE)
-UI_HINT = re.compile(r"鼠标|键盘|WASD|IJKL|空格|左键|右键|单击|双击|拖动|按住|松开", re.IGNORECASE)
+UI_HINT = re.compile(r"鼠标|键盘|WASD|IJKL|空格|左键|右键|单击|双击|拖动|按住|松开|生命值|血量|攻击力|防御力|元素充能|暴击", re.IGNORECASE)
 SENTENCE_ENDS = ("。", "！", "？", ".", "!", "?", "…")
 LOW_CONF_SHORT_SCORE = 0.7
 

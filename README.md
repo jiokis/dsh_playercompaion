@@ -8,8 +8,8 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 
 ## Status
 
-- v0.5.2 code complete: lore_status, lore_capture, lore_query, lore_narrate, lore_overlay, lore_vision, lore_watch.
-- Automated tests: 60 Node tests + 27 Python tests pass.
+- v0.6.0 code complete: lore_status, lore_capture, lore_query, lore_narrate, lore_overlay, lore_vision, lore_watch.
+- Automated tests: 62 Node tests + 28 Python tests pass.
 - Verified: uv bootstrap cache hit, DXcam capture, synthetic Chinese OCR (99.7% score), real-window capture/OCR, end-to-end lore_status.
 - BWIKI live: Genshin 派蒙 and HSR 三月七 both search, fetch, cache and return cleaned snippets; redirects are followed.
 - Akasha live: MCP initialize + akasha_search returned five 凯瑟琳 pathHashes and parsed body snippets.
@@ -20,7 +20,7 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 - v1.3 vision alpha: `lore_vision` performs local composition/UI/map heuristics on the live window or a local PNG/JPG/WebP; real-crop end-to-end passes; annotated preview at `docs/preview-vision.png`.
 - v0.3.0 frame archive: optional local window PNG + JSON (off by default), `lore_status` lists recent frames, `lore_vision` can re-analyze by `frameId`, with maxFrames/retentionDays cleanup.
 - v0.4.0 local semantics: `mode=semantic` uses OCR text + geometry for scene classification (dialogue/map/menu/scene), text blocks, nearby POI labels and composition/readability advice; real crop: scene=dialogue, textBlocks=3.
-- v0.5.2 background watch: `lore_watch` has explicit start/stop/status and reuses the capture pipeline; a **Start recording** pill now sits on the conversation header; unit tests cover start, duplicate/skip/empty/error, stop and double-start. Real-game long-run acceptance is still pending.
+- v0.6.0 background watch: `lore_watch` has explicit start/stop/status and reuses the capture pipeline; a **Start recording** pill now sits on the conversation header; unit tests cover start, duplicate/skip/empty/error, stop and double-start. Real-game long-run acceptance is still pending.
 - Star Rail real dialogue, a 10-minute session, the 10-screenshot CER gate, and a real-game watch long run are still pending.
 
 ## Tools
@@ -152,14 +152,15 @@ After install, the Plugins page shows "Lore Companion" (title/description/icon f
 
 ## In-game overlay
 
-`overlay/overlay.ps1` is a WPF topmost, click-through, non-activating window:
+`overlay/overlay.ps1` is an interactive WPF panel that stays topmost without taking focus:
 
-- Shows status, speaker/title, body, right-side choices, session/time.
-- Default top-right 480x220, dark DSH-style panel with a blue rail, status pill, gold speaker badge and choice chips; configurable top-left / top-right / bottom-center.
-- Auto-hides when Genshin/HSR is not foreground; mouse events pass through to the game.
-- `lore_capture` auto-shows it after a successful capture when enabled; `lore_overlay show|hide|status` controls it.
-- State: `<dataDir>/overlay/state.json`; log: `<dataDir>/overlay/overlay.log`.
-- It is a separate PowerShell process; it never injects input or reads memory.
+- 560x300 panel with a speaker badge, readable body, status pill, session/time, and four actions: **Screenshot**, **Analyze**, **Read**, **Find**.
+- Drag the title bar to move it; click **—** to collapse to a 52px round ball (like an acceleration ball), click the ball to expand. Position and collapsed state persist in `layout.json`.
+- **Read** captures a wider reading region and runs OCR at 1600px, for books/items/reading text; dialogue mode keeps the speech-bubble crop.
+- **Screenshot** saves a local PNG under `<dataDir>/screenshots`; **Analyze** runs local vision; **Find** searches the current speaker/line across logs/Wiki/Akasha/Web.
+- The panel is interactive, so it no longer passes mouse clicks through while open; it is still no-activate and never injects input or reads memory.
+- Auto-hides when Genshin/HSR is not foreground unless a preview state is active; `lore_capture` auto-shows it after a successful capture.
+- State: `<dataDir>/overlay/state.json`; layout: `layout.json`; commands: `command.json`; log: `overlay.log`.
 
 The default top-right area is about 2.9% of a 2560x1440 screen, below the 20% occlusion threshold, so it does not block capture.
 

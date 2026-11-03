@@ -12,8 +12,8 @@
 
 ## 当前状态
 
-- v0.5.2 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch。
-- 自动测试：Node 60 项、Python 27 项全部通过。
+- v0.6.0 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch。
+- 自动测试：Node 62 项、Python 28 项全部通过。
 - 已实测：uv 自举（缓存命中）、DXcam 抓屏、合成中文图 OCR（99.7% 置信度）、真实窗口（Windows 设置）抓屏 + OCR、lore_status 端到端。
 - BWIKI 实测：原神「派蒙」、星铁「三月七」都能搜到并写入本地缓存（各 3 页），redirect 跟随与去导航清洗已生效。
 - 虚空终端实测：Akasha MCP 的 `initialize` + `akasha_search` 返回「凯瑟琳」5 个 pathHash，正文片段解析正确。
@@ -22,11 +22,11 @@
 - 原神无边框实测：DXcam 抓屏成功；书页「召回 / UID」和桌面多窗口误抓已被 UI/前台检查拦下。
 - **原神真实对话已通过**：凯瑟琳 / 冒险家协会接待员 / 正文 / 右侧选项都能拆出；JSONL 写入、第二次抓取 duplicate+seen、按角色名查询、lore_narrate 素材都跑通。
 - DSH 设置页：`client.js` 注册 `plugins.bundle.config`，`configForms` 绑定 `lore-companion`；bundle 注册测试通过。UI 改成 DSH 风格：hero、状态 chip、分组卡片、开关、粘性保存条。
-- 游戏内悬浮窗：WPF 置顶/穿透预览已出图（`docs/preview-overlay.png`）；重做后带左侧蓝轨、图标、状态胶囊、金色说话人 badge、选项 chip；manager spawn/hide/dispose 冒烟通过。
+- 游戏内悬浮窗：v0.6.0 可拖动、可折叠成圆球；带状态胶囊、说话人 badge、正文和截图/分析/阅读/查找按钮（`docs/preview-overlay.png`）；manager spawn/hide/dispose 冒烟通过。
 - **v1.3 视觉分析 alpha 已落地**：`lore_vision` 本地分析构图/UI/地图启发式，支持实时游戏窗口或本地 PNG/JPG；真实截图端到端通过，标注图见 `docs/preview-vision.png`。
 - **v0.3.0 帧归档**：可选保存窗口 PNG + JSON（默认关闭），`lore_status` 列出最近帧，`lore_vision` 可用 `frameId` 复分析；带 maxFrames/retentionDays 清理。
 - **v0.4.0 本地语义**：`mode=semantic` 用 OCR 文本 + 几何做场景分类（对话/地图/菜单/场景）、文字块、POI 邻近标签和构图/可读性建议；真实截图 scene=dialogue、textBlocks=3。
-- **v0.5.2 后台记录**：`lore_watch` 显式 start/stop/status，复用 capture 管线；会话标题栏右侧新增「开始记录」胶囊；unit 覆盖启动、重复/跳过/空/错误、停止和重复启动。真实游戏连续记录仍待人工验收。
+- **v0.6.0 后台记录**：`lore_watch` 显式 start/stop/status，复用 capture 管线；会话标题栏右侧新增「开始记录」胶囊；unit 覆盖启动、重复/跳过/空/错误、停止和重复启动。真实游戏连续记录仍待人工验收。
 - **还差**：星铁真实对话、10 分钟实录、10 张真实截图 CER ≥90%；真实游戏 lore_watch 长跑。
 
 ## 工具
@@ -37,7 +37,7 @@
 | lore_capture | 抓一次当前对话，OCR、去重、写入本地剧情日志 |
 | lore_query | 多源检索：本地日志 / BWIKI / 虚空终端 Akasha MCP / DeepSeek Web Search |
 | lore_narrate | 把最近剧情整理成 transcript、分场景、brief 和 prompt；不调用 LLM |
-| lore_overlay | 显示/隐藏/查看游戏内悬浮窗；置顶、鼠标穿透、不抢焦点 |
+| lore_overlay | 显示/隐藏/查看游戏内悬浮窗；置顶、可拖动、可折叠、不抢焦点 |
 | lore_vision | 本地构图 / UI / 地图 / 语义启发式分析；实时窗口、本地图片或 frameId，可返回标注图；不调用模型 |
 | lore_watch | 显式开始/停止/查看后台轮询；复用 capture 管线、去重和本地日志；不自动启动 |
 
@@ -49,6 +49,14 @@
 - 再点一次停止。
 - 不需要打开设置页，也不需要发消息；它复用 `lore_status` / `lore_watch` 的后台记录。
 - 没出现就是 client bundle 还是旧版：先刷新页面；仍没有就完全退出并重启 DSH。
+
+## 悬浮窗
+
+- 拖动标题栏移动；点右上角 `—` 收成 52px 圆球，点圆球展开；位置/折叠状态存在 `layout.json`。
+- `截图`：抓当前窗口保存到 `<dataDir>/screenshots`；`分析`：本地视觉分析；`查找`：用当前说话人/台词查四路资料。
+- `阅读`：对更宽的阅读区域按 1600px OCR，专门处理书页/物品/任务文本；对话模式仍走气泡裁剪。
+- 修复拖动时 300ms 刷新把窗口拉回原位：拖动期间暂停位置重排；血条/Lv/操作提示在 OCR 层过滤。
+- 悬浮窗是可交互的置顶窗，不再鼠标穿透；仍不抢焦点、不注入输入、不读内存。
 
 ## 知识源
 
@@ -141,7 +149,7 @@ lore_query 默认 `scope=all`，同时查四路；网络源失败只加 warning�
 
     pnpm pack
 
-生成 dsh-lore-companion-0.5.2.tgz，可在插件 UI 用本地压缩包安装。
+生成 dsh-lore-companion-0.6.0.tgz，可在插件 UI 用本地压缩包安装。
 
 ## 首次自举与镜像
 
