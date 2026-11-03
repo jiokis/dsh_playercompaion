@@ -563,7 +563,7 @@ window.__ModuleLoader__.load({
 
       var load = function (nextGame, nextSession) {
         setViewState({ loading: true, error: null });
-        invoke({ action: "snapshot", game: nextGame, session: nextSession || "", limit: 900 }).then(function (result) {
+        invoke({ action: "journal", game: nextGame, session: nextSession || "", limit: 900 }).then(function (result) {
           setSnapshot(result);
           setViewState({ loading: false, error: null });
         }).catch(function (error) {
