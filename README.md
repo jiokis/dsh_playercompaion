@@ -9,7 +9,7 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 ## Status
 
 - v0.8.0 code complete: lore_status, lore_capture, lore_query, lore_narrate, lore_overlay, lore_vision, lore_watch.
-- Automated tests: 66 Node tests + 29 Python tests pass.
+- Automated tests: 66 Node tests + 30 Python tests pass.
 - Verified: uv bootstrap cache hit, DXcam capture, synthetic Chinese OCR (99.7% score), real-window capture/OCR, end-to-end lore_status.
 - BWIKI live: Genshin 派蒙 and HSR 三月七 both search, fetch, cache and return cleaned snippets; redirects are followed.
 - Akasha live: MCP initialize + akasha_search returned five 凯瑟琳 pathHashes and parsed body snippets.

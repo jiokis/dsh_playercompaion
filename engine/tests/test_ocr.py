@@ -58,6 +58,11 @@ def test_dialogue_like_accepts_new_cinematic_subtitle_crop():
     assert ocr.dialogue_like(utterances, (128, 741, 2432, 1397), 2560, 1426) is True
 
 
+def test_dialogue_like_accepts_short_cinematic_line():
+    utterances = [{"text": "是。"}]
+    assert ocr.dialogue_like(utterances, (128, 741, 2432, 1397), 2560, 1438) is True
+
+
 def test_dialogue_like_accepts_speaker_and_body():
     utterances = [{"text": "派蒙"}, {"text": "旅行者，我们走吧！"}]
     assert ocr.dialogue_like(utterances, (200, 1000, 2300, 1300), 2560, 1440) is True

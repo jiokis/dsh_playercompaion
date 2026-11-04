@@ -242,7 +242,9 @@ def dialogue_like(utterances: list[dict], region, frame_width: int, frame_height
         return False
     cleaned = [piece for piece in pieces if piece and not UI_LINE.match(piece) and not UI_STAT.match(piece) and not UI_HINT.search(piece)]
     text = "\n".join(cleaned).strip()
-    if len(text) < 4 or len(text) > 300:
+    # New cinematic subtitles can be a single short sentence such as "是。".
+    # A two-character sentence is valid dialogue; one-character UI junk is not.
+    if len(text) < 2 or len(text) > 300:
         return False
     if not any(piece.endswith(SENTENCE_ENDS) or len(piece) >= 6 for piece in cleaned):
         return False
