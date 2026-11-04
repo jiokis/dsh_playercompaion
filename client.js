@@ -922,7 +922,7 @@ window.__ModuleLoader__.load({
         if (busy) return;
         setState(function (previous) { return Object.assign({}, previous, { busy: true, error: null }); });
         var action = running ? "stop" : "start";
-        var command = action === "start" ? { action: action, game: "auto", intervalSec: 8 } : { action: action };
+        var command = action === "start" ? { action: action, game: "auto", intervalSec: 1 } : { action: action };
         invoke(command).then(function (status) {
           setState(function (previous) { return Object.assign({}, previous, { status: status, busy: false, error: null }); });
         }).catch(function (error) {

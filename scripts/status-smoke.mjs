@@ -14,7 +14,7 @@ const runtime = createRuntime({ config, engineDir, dataDir })
 const logStore = new LogStore({ dataDir })
 const wikiSearch = new WikiSearch({ config, dataDir })
 const ctx = { attachments: { saveImage: async () => ({ attachmentId: 'x' }) } }
-const tool = createStatusTool({ config, runtime, logStore, wikiSearch, ctx, version: '0.8.0' })
+const tool = createStatusTool({ config, runtime, logStore, wikiSearch, ctx, version: '0.9.0' })
 try {
   const result = await tool.execute({}, { signal: new AbortController().signal })
   console.log(JSON.stringify({

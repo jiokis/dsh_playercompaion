@@ -6,13 +6,13 @@
 
 ## 0. 当前阶段
 
-- v0.8.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch。
+- v0.9.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch。
 - v1 附带 DSH 设置页（client.js）和游戏内 WPF 悬浮窗（overlay/overlay.ps1）。
 - 多源检索：本地日志、BWIKI、虚空终端 Akasha MCP（akasha_search）、DSH ctx.web.search（DeepSeek Search API）。
 - 图像元素分析 v1.3 alpha：本地 `lore_vision` 已实现 composition/ui/map/semantic 启发式（实时窗口、本地图片或归档 frameId）。
 - 本地语义：mode=semantic 用 OCR 文本 + 几何做场景分类、文字块、POI 邻近标签与建议；不调用模型。
 - 帧归档：可选本地 PNG + JSON（默认关闭），`lore_status` 列最近帧，`lore_vision` 可复分析；VLM/语义地图仍在 ROADMAP.md。
-- v0.8.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
+- v0.9.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
 - 主界面：会话标题栏右侧 `conversation.session.header.actions` 注册「开始记录」胶囊；会话顶部新增「旅途」`conversation.view`，显示人物、人物关系、事件梗概和详细对话。
 - 只读；不注入输入、不读游戏内存、不改游戏文件、不抢焦点、不上传截图或日志。远程检索只发 query/world 等必要参数。
 - 需要子智能体时统一用 **dsh-opencode-go / minimax-m3.1-flash**。插件 v1 不内置子智能体或 LLM 调用。
@@ -171,7 +171,7 @@
 
 ### lore_watch
 
-- 参数：action（start/stop/status，必填）、intervalSec?（2..300，默认 config.watch.intervalSec=8）、game?、window?、session?、note?、mode?（dialogue/read）。
+- 参数：action（start/stop/status，必填）、intervalSec?（1..300，默认 config.watch.intervalSec=1）、game?、window?、session?、note?、mode?（dialogue/read）。
 - start 只在显式调用时启动；默认 session `watch-YYYYMMDD`，note `watch`；不自动启动、不向 agent 注入通知。
 - 复用 capture 管线：前台/遮挡/黑帧检查、OCR、去重、本地日志、悬浮窗、可选帧归档；错误只累计到 status，不伪造成功。
 - status 返回 running/busy/ticks/captured/duplicates/skipped/empty/errors/lastAt/lastResult/lastError；stop 取消定时器和当前请求。

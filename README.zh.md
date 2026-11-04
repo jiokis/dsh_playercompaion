@@ -45,7 +45,7 @@
 
 安装并**完全重启 DSH** 后，会话标题栏右侧（「对话 / 轨迹」上方）会出现一个胶囊按钮：
 
-- `开始记录`：一键启动 `lore_watch`，默认 8 秒一轮；按钮变绿为 `停止记录`。
+- `开始记录`：一键启动 `lore_watch`，默认 1 秒一轮；按钮变绿为 `停止记录`。
 - 再点一次停止。
 - 不需要打开设置页，也不需要发消息；它复用 `lore_status` / `lore_watch` 的后台记录。
 - 没出现就是 client bundle 还是旧版：先刷新页面；仍没有就完全退出并重启 DSH。
@@ -96,14 +96,14 @@ lore_query 默认 `scope=all`，同时查四路；网络源失败只加 warning�
 
 `lore_watch` 是显式的后台轮询，不会随插件加载自动开始：
 
-- `action=start`：立即抓一次，然后按 `intervalSec`（2..300，默认 8）轮询；默认 session `watch-YYYYMMDD`。
+- `action=start`：立即抓一次，然后按 `intervalSec`（1..300，默认 1）轮询；默认 session `watch-YYYYMMDD`。
 - `action=status`：返回 running/busy/ticks/captured/duplicates/skipped/empty/errors/lastError。
 - `action=stop`：停止定时器并 abort 当前请求。
 - 复用 `lore_capture` 管线：前台/遮挡/黑帧检查、OCR、去重、本地日志、悬浮窗、可选帧归档；不调用模型、不上传。
 - `watch.enabled=false` 时拒绝 start；插件 dispose 会自动 stop。
 
 ```json
-{ "tool": "lore_watch", "action": "start", "game": "genshin", "intervalSec": 8 }
+{ "tool": "lore_watch", "action": "start", "game": "genshin", "intervalSec": 1 }
 ```
 
 ## 环境要求
@@ -265,7 +265,7 @@ v1.3 alpha 已把 composition / ui / map 的本地启发式接进 `lore_vision`�
           retentionDays: 7
         watch:
           enabled: true
-          intervalSec: 8
+          intervalSec: 1
         overlay:
           enabled: true
           autoShow: true
@@ -357,3 +357,10 @@ DSH 会话顶部新增「旅途」视图（在「对话 / 轨迹」后面）：
 - 事件时间线：竖向轨道 + 事件节点，保留时间、角色和抽取式梗概。
 - 详细对话：说话人头像色块、搜索高亮、逐句复制、事件分组。
 - 导出：一键下载 Markdown 或 JSON，数据只在本地生成。
+
+## 低延迟对话跟随
+
+- 后台记录默认 1 秒一轮（原 8 秒），按钮启动也用 1 秒。
+- watch 走 fast 路径：跳过 350–1200ms 的稳定等待，不做每帧区域检测。
+- 三套自适应裁切：底部对话条 → 下半区宽裁 → 中下全宽；连续空帧会切换，覆盖原神新旧对话框。
+- 自动播放/快速点击时优先保证不漏行，抽帧不再等画面“完全稳定”。

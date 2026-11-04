@@ -82,14 +82,14 @@ This is v1.3 alpha: geometry + OCR-keyword semantics, not model understanding. O
 
 `lore_watch` is explicit background polling; it never starts with the plugin:
 
-- `action=start`: capture once, then poll every `intervalSec` (2..300, default 8); default session `watch-YYYYMMDD`.
+- `action=start`: capture once, then poll every `intervalSec` (1..300, default 1); default session `watch-YYYYMMDD`.
 - `action=status`: running/busy/ticks/captured/duplicates/skipped/empty/errors/lastError.
 - `action=stop`: clear the timer and abort the in-flight request.
 - Reuses the `lore_capture` pipeline: foreground/occlusion/black-frame checks, OCR, dedupe, local log, overlay and optional frame archive; no model and no upload.
 - `watch.enabled=false` refuses start; plugin dispose stops it.
 
 ```json
-{ "tool": "lore_watch", "action": "start", "game": "genshin", "intervalSec": 8 }
+{ "tool": "lore_watch", "action": "start", "game": "genshin", "intervalSec": 1 }
 ```
 
 ## Requirements
@@ -240,3 +240,10 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - Event timeline: vertical rail and event nodes with time, speakers, and extractive summaries.
 - Detailed dialogue: speaker avatars/colors, search highlighting, per-line copy, grouped by event.
 - Export: local Markdown or JSON download.
+
+## Low-latency dialogue following
+
+- Watch now defaults to a 1-second cadence (was 8); the start button also uses 1 second.
+- Fast path skips the 350–1200 ms settle wait and does not run region detection on every frame.
+- Three adaptive crops: bottom dialogue strip, wide lower half, center-lower full width; empty frames rotate the profile, covering both old and new Genshin dialogue layouts.
+- Optimized for auto-play / fast-click pacing rather than waiting for a perfectly stable frame.
