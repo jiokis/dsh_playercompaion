@@ -254,3 +254,10 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - **Screenshot** saves a PNG under `<dataDir>/screenshots` plus a sidecar JSON and a 480px JPEG thumbnail.
 - The Journal has a **Screenshots** tab: thumbnail grid, speaker/line/time, click for full image, delete.
 - All local; delete only removes local files.
+
+## AI-curated story
+
+- A minimax-m3.1 subagent cleans the OCR story: merge repeats, fix typos, punctuation, and scene breaks.
+- Output: `<dataDir>/journal/curated.json` and `curated.md`; the Journal adds a **Curated** tab.
+- No invented plot; uncertain fragments are marked OCR-uncertain.
+- The Journal defaults to the latest 300 lines (300/600/1200 switch) and has a **Reset view** button.

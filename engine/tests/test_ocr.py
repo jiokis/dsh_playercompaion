@@ -73,6 +73,11 @@ def test_dialogue_like_rejects_character_screen_stats():
     assert ocr.dialogue_like(utterances, (52, 924, 2508, 1440), 2560, 1440) is False
 
 
+def test_dialogue_like_rejects_currency_and_stats():
+    utterances = [{"text": "摩拉×500"}, {"text": "Lv.100"}, {"text": "25332/43021"}, {"text": "Enter"}]
+    assert ocr.dialogue_like(utterances, (52, 924, 2508, 1440), 2560, 1440) is False
+
+
 def test_dialogue_like_rejects_control_hints():
     utterances = [{"text": "鼠标左键/WASD/空格"}, {"text": "鼠标右键/IJKL/E"}]
     assert ocr.dialogue_like(utterances, (52, 924, 2508, 1440), 2560, 1440) is False

@@ -13,7 +13,7 @@ UI_LINE = re.compile(
 )
 UID_RE = re.compile(r"^UID[:：]?\s*\d{4,}$", re.IGNORECASE)
 UID_LIKE_RE = re.compile(r"^[A-Z][:：]?\s*\d{5,}$", re.IGNORECASE)
-UI_STAT = re.compile(r"^(?:Lv\.?\s*\d+|\d+\s*/\s*\d+|\d{1,3}%|Enter|E|Esc|F|Q|Tab|Shift|Ctrl|Alt|Space|鼠标左键|鼠标右键)$", re.IGNORECASE)
+UI_STAT = re.compile(r"^(?:Lv\.?\s*\d+|\d+\s*/\s*\d+|\d{1,3}%|(?:摩拉|原石|纠缠之缘|相遇之缘)[×xX]\s*\d+|Enter|E|Esc|F|Q|Tab|Shift|Ctrl|Alt|Space|鼠标左键|鼠标右键)$", re.IGNORECASE)
 UI_HINT = re.compile(r"鼠标|键盘|WASD|IJKL|空格|左键|右键|单击|双击|拖动|按住|松开|生命值|血量|攻击力|防御力|元素充能|暴击", re.IGNORECASE)
 SENTENCE_ENDS = ("。", "！", "？", ".", "!", "?", "…")
 LOW_CONF_SHORT_SCORE = 0.7
@@ -268,7 +268,7 @@ def extract_dialogue(lines: list[dict], image_width: int) -> dict:
     for line in lines:
         text = str(line.get("text") or "").strip()
         score = float(line.get("score") or 0)
-        if not text or UID_RE.match(text) or UID_LIKE_RE.match(text) or UI_HINT.search(text):
+        if not text or UID_RE.match(text) or UID_LIKE_RE.match(text) or UI_HINT.search(text) or UI_STAT.match(text):
             continue
         # Short, low-confidence OCR is mostly UI noise such as "网网网" or
         # a misread UID; keep high-confidence short names and real lines.

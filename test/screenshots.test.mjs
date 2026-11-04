@@ -19,6 +19,7 @@ test('screenshot store lists, reads and removes local captures', () => {
     assert.equal(list.length, 1)
     assert.equal(list[0].speaker, '格林')
     assert.equal(list[0].id, 'shot-test.png')
+    assert.match(list[0].thumb, /^data:image\/jpeg;base64,/)
     const full = store.read('shot-test.png')
     assert.match(full.dataUrl, /^data:image\/png;base64,/)
     store.remove('shot-test.png')

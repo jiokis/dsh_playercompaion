@@ -136,6 +136,20 @@ window.__ModuleLoader__.load({
       ".lc-j-modal{position:fixed;inset:0;z-index:1400;background:rgba(5,8,13,.82);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;cursor:zoom-out;gap:12px}",
       ".lc-j-modal img{max-width:min(92vw,1400px);max-height:78vh;object-fit:contain;border-radius:10px;box-shadow:0 24px 80px rgba(0,0,0,.6)}",
       ".lc-j-modal-bar{max-width:min(92vw,1400px);display:flex;align-items:center;gap:10px;color:#dce6f7;font-size:11px;cursor:default}.lc-j-modal-bar span{color:#8b99ad;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:50vw}.lc-j-modal-bar .lc-j-btn{margin-left:4px}",
+      ".lc-j-curated{max-width:900px;margin:0 auto;padding:8px 4px 30px}",
+      ".lc-j-curated-eyebrow{font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#6f8dff;margin-bottom:6px}",
+      ".lc-j-curated-title{font-size:24px;line-height:1.35;margin:0 0 4px;color:#eef3ff;font-weight:650;letter-spacing:-.02em}",
+      ".lc-j-curated-sub{font-size:12px;color:#8a99b0;margin-bottom:10px}",
+      ".lc-j-curated-summary{border-left:2px solid #4b6cff;background:rgba(75,108,255,.07);border-radius:0 8px 8px 0;padding:10px 14px;color:#b9c7dc;font-size:12.5px;line-height:1.7;margin:10px 0 14px}",
+      ".lc-j-curated-chars{margin-bottom:16px}",
+      ".lc-j-curated-scene{border-top:1px solid #242e3d;padding:18px 0 4px}",
+      ".lc-j-curated-scene-head{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}.lc-j-curated-index{font-size:10px;color:#4b6cff;font-variant-numeric:tabular-nums}.lc-j-curated-scene h3{font-size:15px;margin:0;color:#dce6f7;font-weight:600}",
+      ".lc-j-curated-scene-sum{font-size:11.5px;color:#7f8ca1;margin:2px 0 8px 24px}",
+      ".lc-j-curated-line{display:grid;grid-template-columns:120px minmax(0,1fr);gap:12px;padding:6px 0;align-items:start}",
+      ".lc-j-curated-speaker{display:flex;align-items:center;justify-content:flex-end;gap:6px;text-align:right}.lc-j-curated-speaker b{font-size:11px;color:#b7c4d8;font-weight:600;max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+      ".lc-j-curated-text{font-size:13.5px;line-height:1.8;color:#e2e9f5;white-space:pre-wrap}",
+      ".lc-j-curated-title-tag{grid-column:2;font-size:9.5px;color:#6f7c90}",
+      "@media (max-width:760px){.lc-j-curated-line{grid-template-columns:86px minmax(0,1fr);gap:8px}.lc-j-curated-speaker b{max-width:52px}.lc-j-curated-title{font-size:20px}}",
       "@media (max-width:760px){.lc-j-shot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}",
       "@media (max-width:760px){.lc-j-stats{grid-template-columns:repeat(2,1fr)}.lc-j-grid{grid-template-columns:1fr}.lc-j-line-speaker{width:64px}.lc-j-line-name{max-width:40px}}",
       "@media (max-width:640px){.lc-grid{grid-template-columns:1fr}.lc-hero{padding:14px}}"
@@ -640,12 +654,17 @@ window.__ModuleLoader__.load({
       var shotHook = react.useState(null);
       var openShotData = shotHook[0];
       var setOpenShotData = shotHook[1];
+      var limitHook = react.useState(300);
+      var limit = limitHook[0];
+      var setLimit = limitHook[1];
 
-      var load = function (nextGame, nextSession) {
+      var load = function (nextGame, nextSession, nextLimit) {
+        var wanted = Number(nextLimit) || limit || 300;
         setViewState({ loading: true, error: null });
-        invoke({ action: "journal", game: nextGame, session: nextSession || "", limit: 900 }).then(function (result) {
+        invoke({ action: "journal", game: nextGame, session: nextSession || "", limit: wanted }).then(function (result) {
           setSnapshot(result);
           setViewState({ loading: false, error: null });
+          setTab(function (previous) { return previous === "overview" && result.curated ? "curated" : previous; });
         }).catch(function (error) {
           setViewState({ loading: false, error: String(error && error.message || error) });
         });
@@ -662,14 +681,14 @@ window.__ModuleLoader__.load({
         if (typeof window !== "undefined" && !window.confirm("删除这张截图？")) return;
         invoke({ action: "delete-screenshot", id: id }).then(function () {
           setOpenShotData(null);
-          load(game, snapshot ? snapshot.session : "");
+          load(game, snapshot ? snapshot.session : "", limit);
         }).catch(function (error) {
           setViewState(function (previous) { return Object.assign({}, previous, { error: String(error && error.message || error) }); });
         });
       };
 
       react.useEffect(function () {
-        load("genshin", "");
+        load("genshin", "", 300);
       }, []);
 
       var gameLabel = { genshin: "原神", hsr: "星穹铁道" };
@@ -681,7 +700,7 @@ window.__ModuleLoader__.load({
           setGame(value);
           setActiveEvent("");
           setQuery("");
-          load(value, "");
+          load(value, "", limit);
         }
       }, ["genshin", "hsr"].map(function (id) {
         return h("option", { value: id, key: id }, gameLabel[id]);
@@ -690,18 +709,34 @@ window.__ModuleLoader__.load({
       var sessionSelect = h("select", {
         className: "lc-j-select",
         value: snapshot ? snapshot.session : "",
-        onChange: function (event) { load(game, event.target.value); }
+        onChange: function (event) { load(game, event.target.value, limit); }
       }, ((snapshot && snapshot.sessions) || []).map(function (item) {
         return h("option", { value: item.session, key: item.session }, item.session + " · " + item.entries + " 句");
       }));
 
+      var limitSelect = h("select", {
+        className: "lc-j-select",
+        value: String(limit),
+        title: "显示的最近对话行数",
+        onChange: function (event) { var value = Number(event.target.value) || 300; setLimit(value); setTab(snapshot && snapshot.curated ? "curated" : "overview"); load(game, snapshot ? snapshot.session : "", value); }
+      }, [300, 600, 1200].map(function (value) { return h("option", { value: String(value), key: value }, "最近 " + value + " 行"); }));
+      var resetJournal = function () {
+        setQuery("");
+        setActiveEvent("");
+        setOpenShotData(null);
+        setLimit(300);
+        setTab(snapshot && snapshot.curated ? "curated" : "overview");
+        load(game, "", 300);
+        try { window.scrollTo(0, 0); } catch (error) { /* ignore */ }
+      };
       var header = h("div", { className: "lc-j-head" },
         h("div", null,
           h("div", { className: "lc-j-title" }, "旅途记录"),
           h("div", { className: "lc-j-sub" }, "本地 OCR · 只读 · 事件按时间间隔分段，梗概取自原文")
         ),
-        h("div", { className: "lc-j-tools" }, gameSelect, sessionSelect,
-          h("button", { className: "lc-j-btn", type: "button", onClick: function () { load(game, snapshot ? snapshot.session : ""); } }, "刷新"),
+        h("div", { className: "lc-j-tools" }, gameSelect, sessionSelect, limitSelect,
+          h("button", { className: "lc-j-btn", type: "button", onClick: function () { load(game, snapshot ? snapshot.session : "", limit); } }, "刷新"),
+          h("button", { className: "lc-j-btn", type: "button", onClick: resetJournal }, "重置视图"),
           snapshot ? h("button", { className: "lc-j-btn", type: "button", onClick: function () { downloadText("旅途记录-" + (snapshot.session || snapshot.game) + ".md", journalMarkdown(snapshot, gameLabel), "text/markdown;charset=utf-8"); } }, "导出 MD") : null,
           snapshot ? h("button", { className: "lc-j-btn", type: "button", onClick: function () { downloadText("旅途记录-" + (snapshot.session || snapshot.game) + ".json", JSON.stringify(snapshot, null, 2), "application/json;charset=utf-8"); } }, "JSON") : null
         )
@@ -724,6 +759,7 @@ window.__ModuleLoader__.load({
 
       var shotCount = (snapshot.screenshots || []).length;
       var tabs = h("div", { className: "lc-j-tabs" },
+        snapshot.curated ? h("button", { className: "lc-j-tab" + (tab === "curated" ? " active" : ""), type: "button", onClick: function () { setTab("curated"); } }, "整理稿") : null,
         h("button", { className: "lc-j-tab" + (tab === "overview" ? " active" : ""), type: "button", onClick: function () { setTab("overview"); } }, "人物与事件"),
         h("button", { className: "lc-j-tab" + (tab === "dialogue" ? " active" : ""), type: "button", onClick: function () { setTab("dialogue"); } }, "详细对话"),
         h("button", { className: "lc-j-tab" + (tab === "screenshots" ? " active" : ""), type: "button", onClick: function () { setTab("screenshots"); } }, "截图" + (shotCount ? " " + shotCount : ""))
@@ -911,10 +947,42 @@ window.__ModuleLoader__.load({
           }, "删除")
         );
       })) : h("div", { className: "lc-j-empty" }, "还没有截图。在悬浮窗点「截图」会保存到这里。");
+      var curated = snapshot.curated || null;
+      var curatedView = curated ? h("div", { className: "lc-j-curated" },
+        h("div", { className: "lc-j-curated-eyebrow" }, "AI 整理稿 · " + ((curated.source && curated.source.range) || "本场记录")),
+        h("h2", { className: "lc-j-curated-title" }, curated.title || "旅途整理稿"),
+        curated.subtitle ? h("div", { className: "lc-j-curated-sub" }, curated.subtitle) : null,
+        curated.summary ? h("div", { className: "lc-j-curated-summary" }, curated.summary) : null,
+        Array.isArray(curated.characters) && curated.characters.length
+          ? h("div", { className: "lc-j-chars lc-j-curated-chars" }, curated.characters.map(function (person, index) {
+              return h("span", { className: "lc-j-char", key: (person.name || "") + index }, h("b", null, person.name || "未知"), person.role ? h("em", null, person.role) : null);
+            }))
+          : null,
+        (curated.scenes || []).map(function (scene, index) {
+          return h("section", { className: "lc-j-curated-scene", key: scene.id || index },
+            h("div", { className: "lc-j-curated-scene-head" },
+              h("span", { className: "lc-j-curated-index" }, String(index + 1).padStart(2, "0")),
+              h("h3", null, scene.title || "未命名场景")
+            ),
+            scene.summary ? h("p", { className: "lc-j-curated-scene-sum" }, scene.summary) : null,
+            (scene.lines || []).map(function (line, lineIndex) {
+              return h("div", { className: "lc-j-curated-line", key: lineIndex },
+                h("div", { className: "lc-j-curated-speaker" },
+                  line.speaker ? h("span", { className: "lc-j-avatar", style: { background: speakerColor(line.speaker) } }, line.speaker.slice(0, 1)) : h("span", { className: "lc-j-avatar", style: { background: "#334155" } }, "旁"),
+                  h("b", null, line.speaker || "旁白")
+                ),
+                h("div", { className: "lc-j-curated-text" }, line.text || ""),
+                line.title ? h("div", { className: "lc-j-curated-title-tag" }, line.title) : null
+              );
+            })
+          );
+        })
+      ) : h("div", { className: "lc-j-empty" }, "还没有 AI 整理稿。生成 data/journal/curated.json 后会出现在这里。");
+
       var screenshotView = h("div", null,
         h("div", { className: "lc-j-tools" },
           h("span", { className: "lc-j-sub" }, shots.length + " 张本地截图 · 点击查看原图"),
-          h("button", { className: "lc-j-btn", type: "button", onClick: function () { load(game, snapshot ? snapshot.session : ""); } }, "刷新截图")
+          h("button", { className: "lc-j-btn", type: "button", onClick: function () { load(game, snapshot ? snapshot.session : "", limit); } }, "刷新截图")
         ),
         screenshotCards
       );
@@ -928,7 +996,7 @@ window.__ModuleLoader__.load({
         )
       ) : null;
 
-      return h("div", { className: "lc-journal" }, header, statsRow, tabs, tab === "overview" ? overview : tab === "dialogue" ? dialogue : screenshotView, shotModal);
+      return h("div", { className: "lc-journal" }, header, statsRow, tabs, tab === "curated" ? curatedView : tab === "overview" ? overview : tab === "dialogue" ? dialogue : screenshotView, shotModal);
     }
 
     function WatchButton(props) {
