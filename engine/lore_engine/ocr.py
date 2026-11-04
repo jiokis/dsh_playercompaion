@@ -252,7 +252,10 @@ def dialogue_like(utterances: list[dict], region, frame_width: int, frame_height
         return False
     if frame_width > 0 and (right - left) > frame_width * 0.98:
         return False
-    if frame_height > 0 and (bottom - top) > frame_height * 0.38:
+    # Fast watch crops are intentionally taller than the old speech bubble;
+    # judge text/lines, not the crop height. Full-screen UI is still rejected
+    # by the line, sentence and UI filters above.
+    if frame_height > 0 and (bottom - top) > frame_height * 0.85:
         return False
     return True
 
