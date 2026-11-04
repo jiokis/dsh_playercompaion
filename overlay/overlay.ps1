@@ -41,7 +41,9 @@ function Send-Command([string]$action) {
     try {
         $tmp = $script:CommandPath + '.tmp'
         $cmd = @{ id = [guid]::NewGuid().ToString(); action = $action; ts = (Get-Date).ToUniversalTime().ToString('o') } | ConvertTo-Json -Compress
-        Set-Content -LiteralPath $tmp -Value $cmd -Encoding UTF8
+        # PowerShell 5.1 "-Encoding UTF8" writes a BOM; Node JSON.parse would
+        # silently reject every overlay command. Write BOM-less UTF-8.
+        [System.IO.File]::WriteAllText($tmp, $cmd, (New-Object System.Text.UTF8Encoding($false)))
         Move-Item -LiteralPath $tmp -Destination $script:CommandPath -Force
     } catch {}
 }

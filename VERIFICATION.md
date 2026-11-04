@@ -8,7 +8,7 @@ Python：3.12.3
 uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 显示器：2560x1440，150% 缩放（引擎已声明 per-monitor DPI aware）
 
-## 低延迟对话跟随 v0.12.0
+## 低延迟对话跟随 v0.13.0
 
 - watch 默认间隔从 8 秒改为 1 秒；启动按钮也发 1 秒。
 - 增加 `fast` 参数：`settle_ms=0`、`max_settle_ms=0`，watch 跳过稳定等待和每帧区域检测。
@@ -21,7 +21,7 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 
 命令：node --test
 
-结果：68 / 68 通过。
+结果：69 / 69 通过。
 
 覆盖：config（volatile + watch）、text/dedupe、store/query、narrate、wiki mock、tool-contract（7 个工具）、overlay manager、overlay bridge 截图/阅读命令、journal 事件/人物/关系聚合与命令契约、client bundle 注册、client 渲染树、Akasha MCP 解析/调用、WebSource 映射、lore_query 四源 fan-out、lore_vision 本地图片/frameId/实时参数/semantic OCR、帧归档保存/列表/读取/prune、capture frameId、lore_watch 启动/计数/停止/禁用/重复启动、watch remote 契约、readonly、agents-doc、query 默认 all。
 
@@ -29,11 +29,11 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 
 命令：<engine venv>/Scripts/python.exe -m pytest engine/tests -q
 
-结果：31 / 31 通过。
+结果：33 / 33 通过。
 
 覆盖：windows 纯函数、region 合成图、OCR 合成中文图与说话人拆分、真实对话框说话人/头衔/正文/选项拆分、UI 噪声拒绝（血量/等级/操作提示）、protocol ping/非法请求/无窗口错误、vision 合成图构图/UI/map/semantic、analyze_image 协议、菜单/属性截图拒绝、低置信度短文本过滤。
 
-### 旅途视图 v0.12.0
+### 旅途视图 v0.13.0
 
 - DSH 会话顶部新增 `conversation.view`「旅途」：人物卡片、同场关系条、事件梗概、详细对话搜索。
 - `lib/journal.js` 纯本地聚合；`lib/journal-remote.js` 通过 Typert 暴露 snapshot；不调用模型、不上传。

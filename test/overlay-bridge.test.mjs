@@ -83,3 +83,24 @@ test('overlay bridge force capture bypasses dialogue judgement', async () => {
     rmSync(dir, { recursive: true, force: true })
   }
 })
+
+test('overlay bridge accepts a UTF-8 BOM command from PowerShell 5.1', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dsh-lore-overlay-bom-'))
+  try {
+    const config = resolveConfig({ dataDir: dir })
+    const feedback = []
+    const overlay = { update: async (state) => { feedback.push(state); return state } }
+    const runtime = {
+      ensure: async () => ({ request: async () => ({ text: '……', window: { width: 10, height: 10 } }) })
+    }
+    const bridge = new OverlayActionBridge({ config, dataDir: dir, runtime, capture: {}, vision: {}, query: {}, overlay })
+    const commandPath = join(dir, 'overlay', 'command.json')
+    mkdirSync(join(dir, 'overlay'), { recursive: true })
+    writeFileSync(commandPath, '\uFEFF' + JSON.stringify({ action: 'read' }), 'utf8')
+    await bridge.poll()
+    assert.equal(feedback[0].status, '阅读中')
+    assert.equal(feedback[feedback.length - 1].status, '阅读文本')
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})

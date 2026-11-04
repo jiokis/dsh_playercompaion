@@ -63,6 +63,11 @@ def test_dialogue_like_accepts_short_cinematic_line():
     assert ocr.dialogue_like(utterances, (128, 741, 2432, 1397), 2560, 1438) is True
 
 
+def test_dialogue_like_accepts_ellipsis_only_silence():
+    assert ocr.dialogue_like([{"text": "……"}], (128, 741, 2432, 1397), 2560, 1438) is True
+    assert ocr.dialogue_like([{"text": "…"}], (128, 741, 2432, 1397), 2560, 1438) is True
+
+
 def test_dialogue_like_accepts_speaker_and_body():
     utterances = [{"text": "派蒙"}, {"text": "旅行者，我们走吧！"}]
     assert ocr.dialogue_like(utterances, (200, 1000, 2300, 1300), 2560, 1440) is True
@@ -91,6 +96,16 @@ def test_dialogue_like_rejects_hp_and_level_stats():
 def test_dialogue_like_rejects_name_only_frame():
     utterances = [{"text": "奥黛塔"}]
     assert ocr.dialogue_like(utterances, (69, 976, 2491, 1440), 2560, 1440) is False
+
+
+def test_extract_dialogue_keeps_low_confidence_ellipsis():
+    lines = [
+        {"text": "格林", "score": 0.96, "left": 1200, "top": 1100, "right": 1280, "bottom": 1140, "height": 40},
+        {"text": "……", "score": 0.21, "left": 1160, "top": 1160, "right": 1240, "bottom": 1190, "height": 30},
+    ]
+    result = ocr.extract_dialogue(lines, 2560)
+    assert result["speaker"] == "格林"
+    assert result["text"] == "……"
 
 
 def test_extract_dialogue_splits_speaker_title_body_and_choices():

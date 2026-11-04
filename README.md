@@ -267,3 +267,9 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - The full session (10:22–17:01, 2260 cleaned lines) is summarized by four minimax-m3.1 subagents and merged into nine story arcs.
 - The Journal adds a **Synopsis** tab; data at `<dataDir>/journal/synopsis.json`.
 - Only recorded text is used; OCR-uncertain items are marked.
+
+## 0.13.0 fixes
+
+- Overlay commands are now BOM-less UTF-8, and Node accepts a BOM too; screenshot/analyze/read/query/force commands are no longer silently dropped.
+- `PUNCT_ONLY`: a silent character showing only an ellipsis is kept even at low OCR confidence.
+- Speaker aliases from OCR are normalized in the Journal.

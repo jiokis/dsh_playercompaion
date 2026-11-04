@@ -13,7 +13,7 @@
 ## 当前状态
 
 - v0.8.0 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch。
-- 自动测试：Node 68 项、Python 31 项全部通过。
+- 自动测试：Node 69 项、Python 33 项全部通过。
 - 已实测：uv 自举（缓存命中）、DXcam 抓屏、合成中文图 OCR（99.7% 置信度）、真实窗口（Windows 设置）抓屏 + OCR、lore_status 端到端。
 - BWIKI 实测：原神「派蒙」、星铁「三月七」都能搜到并写入本地缓存（各 3 页），redirect 跟随与去导航清洗已生效。
 - 虚空终端实测：Akasha MCP 的 `initialize` + `akasha_search` 返回「凯瑟琳」5 个 pathHash，正文片段解析正确。
@@ -384,3 +384,9 @@ DSH 会话顶部新增「旅途」视图（在「对话 / 轨迹」后面）：
 - 对完整场次（10:22–17:01，清理后 2260 行）做 4 块 minimax-m3.1 梗概，合并为 9 个剧情阶段。
 - 「旅途」新增「剧情梗概」tab；数据在 `<dataDir>/journal/synopsis.json`。
 - 梗概只依据录制文本，标注 OCR 存疑；不补写未记录的剧情。
+
+## 0.13.0 修复
+
+- 悬浮窗按钮命令改为无 BOM UTF-8，Node 同时兼容 BOM；截图/分析/阅读/查找/强制不再被静默丢弃。
+- 新增 `PUNCT_ONLY`：角色沉默只显示「……」时，低置信度省略号不再被短行过滤器删除，可正常记录。
+- 日志视图把「纳西姐/茜特莉/伊湿芙/九条装罗」等 OCR 说话人变体归并到常用译名。
