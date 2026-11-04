@@ -8,7 +8,7 @@ Python：3.12.3
 uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 显示器：2560x1440，150% 缩放（引擎已声明 per-monitor DPI aware）
 
-## 低延迟对话跟随 v0.11.0
+## 低延迟对话跟随 v0.12.0
 
 - watch 默认间隔从 8 秒改为 1 秒；启动按钮也发 1 秒。
 - 增加 `fast` 参数：`settle_ms=0`、`max_settle_ms=0`，watch 跳过稳定等待和每帧区域检测。
@@ -33,7 +33,7 @@ uv：0.12.3（%USERPROFILE%/.local/bin/uv.exe）
 
 覆盖：windows 纯函数、region 合成图、OCR 合成中文图与说话人拆分、真实对话框说话人/头衔/正文/选项拆分、UI 噪声拒绝（血量/等级/操作提示）、protocol ping/非法请求/无窗口错误、vision 合成图构图/UI/map/semantic、analyze_image 协议、菜单/属性截图拒绝、低置信度短文本过滤。
 
-### 旅途视图 v0.11.0
+### 旅途视图 v0.12.0
 
 - DSH 会话顶部新增 `conversation.view`「旅途」：人物卡片、同场关系条、事件梗概、详细对话搜索。
 - `lib/journal.js` 纯本地聚合；`lib/journal-remote.js` 通过 Typert 暴露 snapshot；不调用模型、不上传。

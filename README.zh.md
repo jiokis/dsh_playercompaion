@@ -13,7 +13,7 @@
 ## 当前状态
 
 - v0.8.0 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch。
-- 自动测试：Node 68 项、Python 30 项全部通过。
+- 自动测试：Node 68 项、Python 31 项全部通过。
 - 已实测：uv 自举（缓存命中）、DXcam 抓屏、合成中文图 OCR（99.7% 置信度）、真实窗口（Windows 设置）抓屏 + OCR、lore_status 端到端。
 - BWIKI 实测：原神「派蒙」、星铁「三月七」都能搜到并写入本地缓存（各 3 页），redirect 跟随与去导航清洗已生效。
 - 虚空终端实测：Akasha MCP 的 `initialize` + `akasha_search` 返回「凯瑟琳」5 个 pathHash，正文片段解析正确。
@@ -378,3 +378,9 @@ DSH 会话顶部新增「旅途」视图（在「对话 / 轨迹」后面）：
 - 结果写入 `<dataDir>/journal/curated.json` 和 `curated.md`；旅途新增「整理稿」tab。
 - 不新增原文没有的剧情；无法确认处标注「OCR 存疑」。
 - 旅途默认只显示最近 300 行，可切换 300/600/1200，或点「重置视图」。
+
+## 全片剧情梗概
+
+- 对完整场次（10:22–17:01，清理后 2260 行）做 4 块 minimax-m3.1 梗概，合并为 9 个剧情阶段。
+- 「旅途」新增「剧情梗概」tab；数据在 `<dataDir>/journal/synopsis.json`。
+- 梗概只依据录制文本，标注 OCR 存疑；不补写未记录的剧情。

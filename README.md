@@ -261,3 +261,9 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - Output: `<dataDir>/journal/curated.json` and `curated.md`; the Journal adds a **Curated** tab.
 - No invented plot; uncertain fragments are marked OCR-uncertain.
 - The Journal defaults to the latest 300 lines (300/600/1200 switch) and has a **Reset view** button.
+
+## Full story synopsis
+
+- The full session (10:22–17:01, 2260 cleaned lines) is summarized by four minimax-m3.1 subagents and merged into nine story arcs.
+- The Journal adds a **Synopsis** tab; data at `<dataDir>/journal/synopsis.json`.
+- Only recorded text is used; OCR-uncertain items are marked.
