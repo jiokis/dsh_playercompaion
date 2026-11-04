@@ -126,6 +126,17 @@ window.__ModuleLoader__.load({
       ".lc-j-line-speaker{width:96px;display:flex;align-items:center;justify-content:flex-end;gap:6px;padding-top:1px}.lc-j-line-name{max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11.5px;color:#e8c47a}",
       ".lc-j-line-meta{display:flex;align-items:center;gap:9px}.lc-j-copy{margin-left:auto;opacity:0;border:1px solid #2b3444;background:transparent;color:#7f8b9f;border-radius:5px;padding:1px 5px;font:inherit;font-size:9.5px;cursor:pointer;transition:opacity .15s}.lc-j-line:hover .lc-j-copy{opacity:1}.lc-j-copy:hover{color:#dce6ff;border-color:#5b7cff}",
       ".lc-j-mark{background:rgba(232,196,122,.28);color:#ffe4a8;border-radius:3px;padding:0 1px}",
+      ".lc-j-shot-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}",
+      ".lc-j-shot{border:1px solid #2a3444;border-radius:11px;background:#151c27;overflow:hidden;position:relative;min-width:0}",
+      ".lc-j-shot-img{display:block;width:100%;aspect-ratio:16/9;border:none;background:#0e131c;padding:0;cursor:zoom-in;overflow:hidden}",
+      ".lc-j-shot-img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .2s}.lc-j-shot-img:hover img{transform:scale(1.035)}",
+      ".lc-j-shot-placeholder{display:flex;height:100%;align-items:center;justify-content:center;color:#5f6d82;font-size:11px}",
+      ".lc-j-shot-meta{padding:8px 9px 9px;display:flex;flex-direction:column;gap:3px}.lc-j-shot-meta b{font-size:11.5px;color:#dce6f7;font-weight:600}.lc-j-shot-meta span{font-size:9.5px;color:#6f7c90}.lc-j-shot-meta p{margin:0;font-size:11px;color:#98a6ba;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}",
+      ".lc-j-shot-del{position:absolute;top:6px;right:6px;opacity:0;border:1px solid rgba(240,90,106,.45);border-radius:6px;background:rgba(25,12,16,.86);color:#f09aa6;font:inherit;font-size:9.5px;padding:2px 6px;cursor:pointer}.lc-j-shot:hover .lc-j-shot-del{opacity:1}",
+      ".lc-j-modal{position:fixed;inset:0;z-index:1400;background:rgba(5,8,13,.82);backdrop-filter:blur(4px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px;cursor:zoom-out;gap:12px}",
+      ".lc-j-modal img{max-width:min(92vw,1400px);max-height:78vh;object-fit:contain;border-radius:10px;box-shadow:0 24px 80px rgba(0,0,0,.6)}",
+      ".lc-j-modal-bar{max-width:min(92vw,1400px);display:flex;align-items:center;gap:10px;color:#dce6f7;font-size:11px;cursor:default}.lc-j-modal-bar span{color:#8b99ad;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:50vw}.lc-j-modal-bar .lc-j-btn{margin-left:4px}",
+      "@media (max-width:760px){.lc-j-shot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}",
       "@media (max-width:760px){.lc-j-stats{grid-template-columns:repeat(2,1fr)}.lc-j-grid{grid-template-columns:1fr}.lc-j-line-speaker{width:64px}.lc-j-line-name{max-width:40px}}",
       "@media (max-width:640px){.lc-grid{grid-template-columns:1fr}.lc-hero{padding:14px}}"
     ].join("");
@@ -626,6 +637,9 @@ window.__ModuleLoader__.load({
       var eventHook = react.useState("");
       var activeEvent = eventHook[0];
       var setActiveEvent = eventHook[1];
+      var shotHook = react.useState(null);
+      var openShotData = shotHook[0];
+      var setOpenShotData = shotHook[1];
 
       var load = function (nextGame, nextSession) {
         setViewState({ loading: true, error: null });
@@ -634,6 +648,23 @@ window.__ModuleLoader__.load({
           setViewState({ loading: false, error: null });
         }).catch(function (error) {
           setViewState({ loading: false, error: String(error && error.message || error) });
+        });
+      };
+
+      var openShot = function (id) {
+        invoke({ action: "screenshot", id: id }).then(function (result) {
+          setOpenShotData(result);
+        }).catch(function (error) {
+          setViewState(function (previous) { return Object.assign({}, previous, { error: String(error && error.message || error) }); });
+        });
+      };
+      var deleteShot = function (id) {
+        if (typeof window !== "undefined" && !window.confirm("删除这张截图？")) return;
+        invoke({ action: "delete-screenshot", id: id }).then(function () {
+          setOpenShotData(null);
+          load(game, snapshot ? snapshot.session : "");
+        }).catch(function (error) {
+          setViewState(function (previous) { return Object.assign({}, previous, { error: String(error && error.message || error) }); });
         });
       };
 
@@ -691,9 +722,11 @@ window.__ModuleLoader__.load({
         h("div", { className: "lc-j-stat" }, h("b", null, String(stats.sessions)), h("span", null, "记录场次"))
       );
 
+      var shotCount = (snapshot.screenshots || []).length;
       var tabs = h("div", { className: "lc-j-tabs" },
         h("button", { className: "lc-j-tab" + (tab === "overview" ? " active" : ""), type: "button", onClick: function () { setTab("overview"); } }, "人物与事件"),
-        h("button", { className: "lc-j-tab" + (tab === "dialogue" ? " active" : ""), type: "button", onClick: function () { setTab("dialogue"); } }, "详细对话")
+        h("button", { className: "lc-j-tab" + (tab === "dialogue" ? " active" : ""), type: "button", onClick: function () { setTab("dialogue"); } }, "详细对话"),
+        h("button", { className: "lc-j-tab" + (tab === "screenshots" ? " active" : ""), type: "button", onClick: function () { setTab("screenshots"); } }, "截图" + (shotCount ? " " + shotCount : ""))
       );
 
       if (!snapshot.entries.length) {
@@ -857,7 +890,45 @@ window.__ModuleLoader__.load({
         })) : h("div", { className: "lc-j-empty" }, "没有匹配的台词。")
       );
 
-      return h("div", { className: "lc-journal" }, header, statsRow, tabs, tab === "overview" ? overview : dialogue);
+      var shots = snapshot.screenshots || [];
+      var screenshotCards = shots.length ? h("div", { className: "lc-j-shot-grid" }, shots.map(function (shot) {
+        return h("div", { className: "lc-j-shot", key: shot.id },
+          h("button", { className: "lc-j-shot-img", type: "button", onClick: function () { openShot(shot.id); } },
+            shot.thumb
+              ? h("img", { src: shot.thumb, alt: shot.speaker || "游戏截图", loading: "lazy" })
+              : h("span", { className: "lc-j-shot-placeholder" }, "无缩略图")
+          ),
+          h("div", { className: "lc-j-shot-meta" },
+            h("b", null, shot.speaker || "截图"),
+            h("span", null, fmtDay(shot.ts) + " " + fmtClock(shot.ts)),
+            h("p", null, shot.text || "（无识别文字）")
+          ),
+          h("button", {
+            className: "lc-j-shot-del",
+            type: "button",
+            title: "删除截图",
+            onClick: function (event) { event.stopPropagation(); deleteShot(shot.id); }
+          }, "删除")
+        );
+      })) : h("div", { className: "lc-j-empty" }, "还没有截图。在悬浮窗点「截图」会保存到这里。");
+      var screenshotView = h("div", null,
+        h("div", { className: "lc-j-tools" },
+          h("span", { className: "lc-j-sub" }, shots.length + " 张本地截图 · 点击查看原图"),
+          h("button", { className: "lc-j-btn", type: "button", onClick: function () { load(game, snapshot ? snapshot.session : ""); } }, "刷新截图")
+        ),
+        screenshotCards
+      );
+      var shotModal = openShotData ? h("div", { className: "lc-j-modal", onClick: function () { setOpenShotData(null); } },
+        h("img", { src: openShotData.dataUrl, alt: (openShotData.meta && openShotData.meta.speaker) || "截图原图" }),
+        h("div", { className: "lc-j-modal-bar", onClick: function (event) { event.stopPropagation(); } },
+          h("b", null, (openShotData.meta && openShotData.meta.speaker) || openShotData.id),
+          h("span", null, (openShotData.meta && openShotData.meta.text) || ""),
+          h("button", { className: "lc-j-btn", type: "button", onClick: function () { setOpenShotData(null); } }, "关闭"),
+          h("button", { className: "lc-j-btn", type: "button", onClick: function () { deleteShot(openShotData.id); } }, "删除")
+        )
+      ) : null;
+
+      return h("div", { className: "lc-journal" }, header, statsRow, tabs, tab === "overview" ? overview : tab === "dialogue" ? dialogue : screenshotView, shotModal);
     }
 
     function WatchButton(props) {

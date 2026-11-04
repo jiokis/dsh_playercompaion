@@ -9,7 +9,7 @@ It never injects input, reads game memory, modifies game files, steals focus, or
 ## Status
 
 - v0.8.0 code complete: lore_status, lore_capture, lore_query, lore_narrate, lore_overlay, lore_vision, lore_watch.
-- Automated tests: 66 Node tests + 30 Python tests pass.
+- Automated tests: 68 Node tests + 30 Python tests pass.
 - Verified: uv bootstrap cache hit, DXcam capture, synthetic Chinese OCR (99.7% score), real-window capture/OCR, end-to-end lore_status.
 - BWIKI live: Genshin 派蒙 and HSR 三月七 both search, fetch, cache and return cleaned snippets; redirects are followed.
 - Akasha live: MCP initialize + akasha_search returned five 凯瑟琳 pathHashes and parsed body snippets.
@@ -247,3 +247,10 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - Fast path skips the 350–1200 ms settle wait and does not run region detection on every frame.
 - Three adaptive crops: bottom dialogue strip, wide lower half, center-lower full width; empty frames rotate the profile, covering both old and new Genshin dialogue layouts.
 - Optimized for auto-play / fast-click pacing rather than waiting for a perfectly stable frame.
+
+## Force and screenshots
+
+- The overlay has a **Force** button: it bypasses the dialogue classifier and records the current crop. OCR still has to find text.
+- **Screenshot** saves a PNG under `<dataDir>/screenshots` plus a sidecar JSON and a 480px JPEG thumbnail.
+- The Journal has a **Screenshots** tab: thumbnail grid, speaker/line/time, click for full image, delete.
+- All local; delete only removes local files.

@@ -106,6 +106,7 @@ $xaml = @"
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,9,0,0">
           <Border x:Name="BtnShot" Background="#182235" BorderBrush="#2A3C5E" BorderThickness="1" CornerRadius="8" Padding="11,5" Margin="0,0,7,0" Cursor="Hand"><TextBlock Text="截图" Foreground="#A9C1FF" FontSize="11.5"/></Border>
           <Border x:Name="BtnAnalyze" Background="#182235" BorderBrush="#2A3C5E" BorderThickness="1" CornerRadius="8" Padding="11,5" Margin="0,0,7,0" Cursor="Hand"><TextBlock Text="分析" Foreground="#A9C1FF" FontSize="11.5"/></Border>
+          <Border x:Name="BtnForce" Background="#2A2117" BorderBrush="#5A4522" BorderThickness="1" CornerRadius="8" Padding="11,5" Margin="0,0,7,0" Cursor="Hand" ToolTip="忽略对话判定，强制把当前画面记成对话"><TextBlock Text="强制" Foreground="#E8C47A" FontSize="11.5"/></Border>
           <Border x:Name="BtnRead" Background="#182235" BorderBrush="#2A3C5E" BorderThickness="1" CornerRadius="8" Padding="11,5" Margin="0,0,7,0" Cursor="Hand"><TextBlock Text="阅读" Foreground="#A9C1FF" FontSize="11.5"/></Border>
           <Border x:Name="BtnFind" Background="#182235" BorderBrush="#2A3C5E" BorderThickness="1" CornerRadius="8" Padding="11,5" Margin="0,0,7,0" Cursor="Hand"><TextBlock Text="查找" Foreground="#A9C1FF" FontSize="11.5"/></Border>
           <TextBlock Text="拖动标题栏移动 · — 收起" Foreground="#596578" FontSize="9.5" VerticalAlignment="Center" Margin="5,0,0,0"/>
@@ -268,6 +269,7 @@ try {
 } catch {}
 try { $script:Window.FindName('BtnShot').Add_MouseLeftButtonUp({ Send-Command 'screenshot' }) } catch {}
 try { $script:Window.FindName('BtnAnalyze').Add_MouseLeftButtonUp({ Send-Command 'vision' }) } catch {}
+try { $script:Window.FindName('BtnForce').Add_MouseLeftButtonUp({ Send-Command 'force' }) } catch {}
 try { $script:Window.FindName('BtnRead').Add_MouseLeftButtonUp({ Send-Command 'read' }) } catch {}
 try { $script:Window.FindName('BtnFind').Add_MouseLeftButtonUp({ Send-Command 'query' }) } catch {}
 

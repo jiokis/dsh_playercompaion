@@ -13,7 +13,7 @@
 ## 当前状态
 
 - v0.8.0 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch。
-- 自动测试：Node 66 项、Python 30 项全部通过。
+- 自动测试：Node 68 项、Python 30 项全部通过。
 - 已实测：uv 自举（缓存命中）、DXcam 抓屏、合成中文图 OCR（99.7% 置信度）、真实窗口（Windows 设置）抓屏 + OCR、lore_status 端到端。
 - BWIKI 实测：原神「派蒙」、星铁「三月七」都能搜到并写入本地缓存（各 3 页），redirect 跟随与去导航清洗已生效。
 - 虚空终端实测：Akasha MCP 的 `initialize` + `akasha_search` 返回「凯瑟琳」5 个 pathHash，正文片段解析正确。
@@ -364,3 +364,10 @@ DSH 会话顶部新增「旅途」视图（在「对话 / 轨迹」后面）：
 - watch 走 fast 路径：跳过 350–1200ms 的稳定等待，不做每帧区域检测。
 - 三套自适应裁切：底部对话条 → 下半区宽裁 → 中下全宽；连续空帧会切换，覆盖原神新旧对话框。
 - 自动播放/快速点击时优先保证不漏行，抽帧不再等画面“完全稳定”。
+
+## 强制记录与截图管理
+
+- 悬浮窗新增「强制」按钮：跳过对话判定，直接按当前裁切 OCR 并写入日志；仍不绕过 OCR，画面没字就失败。
+- 「截图」保存到 `<dataDir>/screenshots`，同时写 sidecar JSON 和 480px 缩略图。
+- 「旅途」新增「截图」tab：缩略图网格、说话人/台词/时间、点击看原图、可删除。
+- 截图与日志都只在本地，不上传；删除只影响本地文件。

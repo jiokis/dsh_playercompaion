@@ -60,3 +60,26 @@ test('overlay bridge runs reading OCR with a wider region', async () => {
     rmSync(dir, { recursive: true, force: true })
   }
 })
+
+test('overlay bridge force capture bypasses dialogue judgement', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dsh-lore-overlay-force-'))
+  try {
+    const config = resolveConfig({ dataDir: dir })
+    const feedback = []
+    const overlay = { readState: () => ({ game: 'genshin', session: 's1' }), update: async (state) => { feedback.push(state); return state } }
+    const capture = {
+      execute: async (args) => {
+        assert.equal(args.force, true)
+        assert.equal(args.fast, true)
+        return { captured: true, entries: [{ speaker: '众人', text: '是。' }], text: '是。' }
+      }
+    }
+    const bridge = new OverlayActionBridge({ config, dataDir: dir, runtime: {}, capture, vision: {}, query: {}, overlay })
+    await bridge.execute({ action: 'force' })
+    assert.equal(feedback[0].status, '强制识别中')
+    assert.equal(feedback[feedback.length - 1].status, '已强制记录')
+    assert.match(feedback[feedback.length - 1].text, /众人：是。/)
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+})
