@@ -8,6 +8,7 @@ import { createNarrateTool } from '../lib/tools/narrate.js'
 import { createOverlayTool } from '../lib/tools/overlay.js'
 import { createVisionTool } from '../lib/tools/vision.js'
 import { createWatchTool } from '../lib/tools/watch.js'
+import { createStoryTool } from '../lib/tools/story.js'
 
 const config = resolveConfig({})
 const runtime = {
@@ -39,13 +40,14 @@ const watcher = {
 
 test('tool definitions satisfy the host defineTool contract', () => {
   const tools = [
-    createStatusTool({ config, runtime, logStore, wikiSearch, ctx, overlay, watcher, version: '0.13.0' }),
+    createStatusTool({ config, runtime, logStore, wikiSearch, ctx, overlay, watcher, version: '0.14.0' }),
     createCaptureTool({ config, runtime, logStore, ctx, overlay }),
     createQueryTool({ config, logStore, wikiSearch }),
     createNarrateTool({ config, logStore, wikiSearch }),
     createOverlayTool({ config, overlay }),
     createVisionTool({ config, runtime, ctx }),
-    createWatchTool({ config, watcher })
+    createWatchTool({ config, watcher }),
+    createStoryTool({ config, logStore, dataDir: 'D:/tmp' })
   ]
   for (const tool of tools) {
     assert.equal(typeof tool.name, 'string')
@@ -54,5 +56,5 @@ test('tool definitions satisfy the host defineTool contract', () => {
     assert.ok(tool.parameters && typeof tool.parameters === 'object')
     assert.ok(tool.output && tool.output.schema && typeof tool.output.render === 'function')
   }
-  assert.deepEqual(tools.map((tool) => tool.name), ['lore_status', 'lore_capture', 'lore_query', 'lore_narrate', 'lore_overlay', 'lore_vision', 'lore_watch'])
+  assert.deepEqual(tools.map((tool) => tool.name), ['lore_status', 'lore_capture', 'lore_query', 'lore_narrate', 'lore_overlay', 'lore_vision', 'lore_watch', 'lore_story'])
 })

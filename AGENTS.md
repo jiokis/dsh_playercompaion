@@ -6,13 +6,13 @@
 
 ## 0. 当前阶段
 
-- v0.13.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch。
+- v0.14.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch、lore_story。
 - v1 附带 DSH 设置页（client.js）和游戏内 WPF 悬浮窗（overlay/overlay.ps1）。
 - 多源检索：本地日志、BWIKI、虚空终端 Akasha MCP（akasha_search）、DSH ctx.web.search（DeepSeek Search API）。
 - 图像元素分析 v1.3 alpha：本地 `lore_vision` 已实现 composition/ui/map/semantic 启发式（实时窗口、本地图片或归档 frameId）。
 - 本地语义：mode=semantic 用 OCR 文本 + 几何做场景分类、文字块、POI 邻近标签与建议；不调用模型。
 - 帧归档：可选本地 PNG + JSON（默认关闭），`lore_status` 列最近帧，`lore_vision` 可复分析；VLM/语义地图仍在 ROADMAP.md。
-- v0.13.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
+- v0.14.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
 - 主界面：会话标题栏右侧 `conversation.session.header.actions` 注册「开始记录」胶囊；会话顶部新增「旅途」`conversation.view`，显示人物、人物关系、事件梗概和详细对话。
 - 只读；不注入输入、不读游戏内存、不改游戏文件、不抢焦点、不上传截图或日志。远程检索只发 query/world 等必要参数。
 - 需要子智能体时统一用 **dsh-opencode-go / minimax-m3.1-flash**。插件 v1 不内置子智能体或 LLM 调用。
@@ -71,7 +71,7 @@
 ## 3. 架构与数据流
 
     DSH Host (Node, ESM)
-      lib/index.js        apply(): 读配置、注册 7 个工具、启动自举、dispose
+      lib/index.js        apply(): 读配置、注册 8 个工具、启动自举、dispose
       lib/config.js       schemastery Config + resolveConfig（默认值 + 环境变量）
       lib/bootstrap.js    uv venv + requirements + 健康检查 + warmup + 缓存
       lib/engine.js       stdio JSON-lines 客户端（超时/崩溃/退出清理）
@@ -84,6 +84,7 @@
       lib/watcher.js       显式后台轮询（start/stop/status，不自动启动）
       lib/tools/vision.js  lore_vision 工具（实时/本地图片/frameId + 附件）
       lib/tools/watch.js   lore_watch 工具（后台轮询控制）
+      lib/tools/story.js   lore_story 工具（向 QQ/会话暴露本地剧情梗概与台词检索）
       lib/watch-remote.js  Host Typert remote：主界面按钮 start/stop/status
       lib/narrate.js      分场景、关键句、brief、prompt
       lib/render.js       工具结果的简洁文本渲染
@@ -169,6 +170,14 @@
 - imagePath 模式读本地 PNG/JPG/WebP（≤20MB），走 `analyze_image`；frameId 模式读归档帧；不上传。
 - 返回 analysis（findings/elements/metrics/sections/warnings；semantic 含 scene/textBlocks/POI 标签/建议）、annotated image attachment（可选）、source（screen/image/frame）、frameId（可选）。
 - 本地 OpenCV 启发式：构图、UI 面板、地图 POI 候选；不做语义断言、不寻路、不注入输入。
+
+### lore_story
+
+- 参数：action（summary/search/character/scene/recent/stats，默认 summary）、query?、game?、session?、limit?（1..20，默认 8）。
+- summary 读取 `<dataDir>/journal/synopsis.json`，返回标题、总纲、9 个阶段和未解决项；scene 按标题/摘要检索阶段。
+- search 走本地日志 `LogStore.query`；character 按说话人（含 OCR 别名）汇总；recent 返回最近台词；stats 返回场次/行数/阶段数。
+- 全部只读、只在本机读取；结果里的 `text` 可直接作为 QQ 回复发送。
+- QQ 桥接的 `qq-tool-restrict` 执行期白名单需放行 `lore_story`。
 
 ### lore_watch
 
@@ -296,7 +305,7 @@ Python 测试：
 
 ## 10. Definition of Done
 
-- [ ] 7 个工具出现在 DSH 工具列表（含 lore_overlay、lore_vision、lore_watch），lore_status 能报告引擎/窗口/OCR/数据目录/悬浮窗/后台记录。
+- [ ] 8 个工具出现在 DSH 工具列表（含 lore_overlay、lore_vision、lore_watch），lore_status 能报告引擎/窗口/OCR/数据目录/悬浮窗/后台记录。
 - [ ] 真实游戏能 lore_capture 写入 JSONL；重复只写 seen；推进后记新句。
 - [ ] 遮挡/最小化/找不到窗口会拒绝并写清楚原因，不写日志。
 - [ ] lore_query 能按关键词/时间/会话命中；本地/BWIKI/Akasha/Web 四源可选择；断网回退缓存；无缓存不编造。
