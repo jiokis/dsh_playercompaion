@@ -13,7 +13,7 @@
 ## 当前状态
 
 - v0.8.0 代码已完成：lore_status / lore_capture / lore_query / lore_narrate / lore_overlay / lore_vision / lore_watch。
-- 自动测试：Node 70 项、Python 33 项全部通过。
+- 自动测试：Node 71 项、Python 33 项全部通过。
 - 已实测：uv 自举（缓存命中）、DXcam 抓屏、合成中文图 OCR（99.7% 置信度）、真实窗口（Windows 设置）抓屏 + OCR、lore_status 端到端。
 - BWIKI 实测：原神「派蒙」、星铁「三月七」都能搜到并写入本地缓存（各 3 页），redirect 跟随与去导航清洗已生效。
 - 虚空终端实测：Akasha MCP 的 `initialize` + `akasha_search` 返回「凯瑟琳」5 个 pathHash，正文片段解析正确。
@@ -385,7 +385,7 @@ DSH 会话顶部新增「旅途」视图（在「对话 / 轨迹」后面）：
 - 「旅途」新增「剧情梗概」tab；数据在 `<dataDir>/journal/synopsis.json`。
 - 梗概只依据录制文本，标注 OCR 存疑；不补写未记录的剧情。
 
-## 0.16.0 修复
+## 0.17.0 修复
 
 - 悬浮窗按钮命令改为无 BOM UTF-8，Node 同时兼容 BOM；截图/分析/阅读/查找/强制不再被静默丢弃。
 - 新增 `PUNCT_ONLY`：角色沉默只显示「……」时，低置信度省略号不再被短行过滤器删除，可正常记录。
@@ -398,17 +398,25 @@ DSH 会话顶部新增「旅途」视图（在「对话 / 轨迹」后面）：
 - 返回的 `text` 是可直接发到 QQ 的纯文本。
 - QQ 桥接的 `plugins/qq-agent-presets/qq-tool-restrict.mjs` 已放行 `lore_story`；需要重启 QQ 桥接或新建会话让工具 schema 生效。
 
-## 0.16.0 界面
+## 0.17.0 界面
 
 - 旅途页改成阅读型布局：顶部英雄区、场次/时间胶囊、四个统计卡、吸顶分段导航。
 - 剧情梗概增加章节索引、时间线节点、场景卡和阅读排版；点击章节可直接跳转。
 - 截图、事件卡、人物卡统一细边框/渐变表面；支持键盘焦点与 reduced-motion。
 - 游戏内悬浮窗改为深蓝渐变、柔和描边、状态光点和更宽松的正文行高。
 
-## 0.16.0 锚点与记忆
+## 0.17.0 锚点与记忆
 
 - 悬浮窗折叠/展开固定右上角：球停靠面板右上角，展开向左、向下生长；拖动面板后不会在 300ms 刷新时回弹。
 - OCR 低置信度（<0.62）时对裁切区域做 1.5x 放大重识别，保留更高分/更完整结果。
 - 新增结构化记忆 `journal/memory.json`：阶段、人物、关系、未解决线索、最近对白；`lore_story` 增加 `memory` 与 `context`。
 - `context` 输出当前阶段、最近对白、在场人物、线索和受控陪玩 prompt。
 - 调研与实时陪玩路线见 [docs/REALTIME-COMPANION.md](docs/REALTIME-COMPANION.md)。
+
+## 0.17.0 主线/世界任务
+
+- 新增 `<dataDir>/journal/quests.json` 场次映射：`type=main|world|activity|story`，`name` 为任务名。
+- 示例见 [docs/quests.example.json](docs/quests.example.json)。
+- 旅途顶部显示「主线 · 圣土化」或「世界任务 · 新基捷」徽章。
+- 梗概按场次绑定：选中世界任务场次时不会再把主线的 9 段梗概套过去；世界任务整理稿需要单独生成。
+- 默认打开有主线的场次；世界任务仍可从场次下拉选择。

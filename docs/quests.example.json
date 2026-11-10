@@ -1,0 +1,15 @@
+{
+  "v": 1,
+  "sessions": {
+    "watch-20261104": {
+      "type": "main",
+      "name": "圣土化",
+      "day": 1
+    },
+    "watch-20261105": {
+      "type": "world",
+      "name": "新基捷",
+      "day": 2
+    }
+  }
+}

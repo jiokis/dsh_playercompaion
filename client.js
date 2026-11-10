@@ -177,6 +177,7 @@ window.__ModuleLoader__.load({
       .lc-j-pill-dim{color:#6f7c91;border-color:rgba(120,137,163,.14)}
       .lc-j-pill-live{color:#8fe3b0;border-color:rgba(78,216,154,.22);background:rgba(78,216,154,.055)}
       .lc-j-pill-live:before{content:"";width:4px;height:4px;border-radius:50%;background:#8fe3b0;margin-right:5px;box-shadow:0 0 8px rgba(143,227,176,.7)}
+      .lc-j-pill-quest{border-color:rgba(143,164,255,.30);background:rgba(111,141,255,.10);color:#c7d4ff}
       .lc-j-tools{gap:7px;align-items:center;justify-content:flex-end}
       .lc-j-select,.lc-j-input{height:32px;border-radius:9px;border:1px solid rgba(119,139,173,.24);background:rgba(9,13,21,.48);color:#cbd7ea;padding:0 9px;font-size:11px;transition:border-color .15s,background .15s}
       .lc-j-select:hover,.lc-j-input:hover{border-color:rgba(111,141,255,.5);background:rgba(18,25,38,.7)}
@@ -756,7 +757,13 @@ window.__ModuleLoader__.load({
         invoke({ action: "journal", game: nextGame, session: nextSession || "", limit: wanted }).then(function (result) {
           setSnapshot(result);
           setViewState({ loading: false, error: null });
-          setTab(function (previous) { return previous === "overview" && result.synopsis ? "synopsis" : previous === "overview" && result.curated ? "curated" : previous; });
+          setTab(function (previous) {
+            if (!result.synopsis && previous === "synopsis") return "overview";
+            if (!result.curated && previous === "curated") return "overview";
+            if (previous === "overview" && result.synopsis) return "synopsis";
+            if (previous === "overview" && result.curated) return "curated";
+            return previous;
+          });
         }).catch(function (error) {
           setViewState({ loading: false, error: String(error && error.message || error) });
         });
@@ -844,6 +851,7 @@ window.__ModuleLoader__.load({
         ),
         h("div", { className: "lc-j-hero-meta" },
           h("span", { className: "lc-j-pill lc-j-pill-gold" }, gameLabel[game] || "原神"),
+          snapshot && snapshot.quest ? h("span", { className: "lc-j-pill lc-j-pill-quest" }, snapshot.quest.label + (snapshot.quest.name ? " · " + snapshot.quest.name : "")) : null,
           h("span", { className: "lc-j-pill" }, heroSession),
           snapshot ? h("span", { className: "lc-j-pill" }, (snapshot.entries || []).length + " 行") : null,
           heroFirst ? h("span", { className: "lc-j-pill lc-j-pill-dim" }, fmtDay(heroFirst) + " " + fmtClock(heroFirst) + " → " + fmtClock(heroLast)) : null,
