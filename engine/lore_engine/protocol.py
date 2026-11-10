@@ -10,6 +10,7 @@ import sys
 import time
 import traceback
 
+import cv2
 import numpy as np
 
 from . import capture as capture_mod
@@ -324,6 +325,22 @@ def capture(params: dict | None = None) -> dict:
     try:
         if mode == "dialogue":
             parsed = ocr_mod.read_dialogue(ocr_engine, region_crop, min_score=min_score)
+            # A low-confidence short line is often caused by a small glyph
+            # (ellipsis, punctuation, a one-character reply). One upscaled
+            # retry is cheaper than a second full-frame capture and usually
+            # recovers the character shape.
+            if parsed.get("text") and float(parsed.get("score") or 0) < 0.62:
+                try:
+                    enlarged = cv2.resize(region_crop, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_CUBIC)
+                    retry = ocr_mod.read_dialogue(ocr_engine, enlarged, min_score=min_score)
+                    if retry.get("text") and (
+                        float(retry.get("score") or 0) > float(parsed.get("score") or 0) + 0.02
+                        or len(retry.get("text") or "") > len(parsed.get("text") or "") + 2
+                    ):
+                        parsed = retry
+                        frames += 1
+                except Exception as exc:
+                    log("upscaled OCR retry failed: " + str(exc))
         else:
             lines = ocr_engine.read(region_crop, min_score=min_score)
             utterances = ocr_mod.merge_lines(lines)

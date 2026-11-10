@@ -10,6 +10,10 @@ $script:CommandPath = Join-Path $script:Dir 'command.json'
 $script:Window = $null
 $script:Dragging = $false
 $script:Layout = [ordered]@{ panelX = -1; panelY = -1; ballX = -1; ballY = -1; collapsed = $false }
+$script:PanelW = 560
+$script:PanelH = 300
+$script:BallSize = 52
+$script:Edge = 28
 
 function Log([string]$m) { try { Add-Content -LiteralPath $script:LogPath -Value ('[' + (Get-Date).ToString('s') + '] ' + $m) -Encoding UTF8 } catch {} }
 function Brush([string]$h) { try { return [System.Windows.Media.BrushConverter]::new().ConvertFromString($h) } catch { return $null } }
@@ -117,14 +121,14 @@ $xaml = @"
           <Border x:Name="BtnForce" Background="#2A2117" BorderBrush="#5A4522" BorderThickness="1" CornerRadius="8" Padding="11,5" Margin="0,0,7,0" Cursor="Hand" ToolTip="忽略对话判定，强制把当前画面记成对话"><TextBlock Text="强制" Foreground="#E8C47A" FontSize="11.5"/></Border>
           <Border x:Name="BtnRead" Background="#182235" BorderBrush="#2A3C5E" BorderThickness="1" CornerRadius="8" Padding="11,5" Margin="0,0,7,0" Cursor="Hand"><TextBlock Text="阅读" Foreground="#A9C1FF" FontSize="11.5"/></Border>
           <Border x:Name="BtnFind" Background="#182235" BorderBrush="#2A3C5E" BorderThickness="1" CornerRadius="8" Padding="11,5" Margin="0,0,7,0" Cursor="Hand"><TextBlock Text="查找" Foreground="#A9C1FF" FontSize="11.5"/></Border>
-          <TextBlock Text="拖动标题栏移动 · — 收起" Foreground="#596578" FontSize="9.5" VerticalAlignment="Center" Margin="5,0,0,0"/>
+          <TextBlock Text="右上角锚定 · 拖动移动 · — 收起" Foreground="#596578" FontSize="9.5" VerticalAlignment="Center" Margin="5,0,0,0"/>
         </StackPanel>
         <Border Grid.Row="4" BorderBrush="#242B36" BorderThickness="0,1,0,0" Margin="0,8,0,0" Padding="0,6,0,0">
           <Grid><TextBlock x:Name="Meta" Foreground="#6F7A8A" FontSize="9.5"/><TextBlock Text="LOCAL OCR" Foreground="#586274" FontSize="9" HorizontalAlignment="Right"/></Grid>
         </Border>
       </Grid>
     </Border>
-    <Border x:Name="Ball" Width="52" Height="52" CornerRadius="26" Background="#F2141720" BorderBrush="#4B6CFF" BorderThickness="1" Visibility="Collapsed" Cursor="Hand">
+    <Border x:Name="Ball" Width="52" Height="52" CornerRadius="26" Background="#F2141720" BorderBrush="#4B6CFF" BorderThickness="1" Visibility="Collapsed" Cursor="Hand" ToolTip="展开（保持右上角锚定）">
       <Border.Effect><DropShadowEffect BlurRadius="16" ShadowDepth="0" Opacity="0.55" Color="#000000"/></Border.Effect>
       <Grid>
         <Path Data="M4,3 L12,3 L12,15 L8,12 L4,15 Z" Fill="#FFFFFF" Stretch="Uniform" Width="16" Height="19" HorizontalAlignment="Center" VerticalAlignment="Center"/>
@@ -179,24 +183,43 @@ function Set-Status([string]$status) {
     if ($ballDot) { $ballDot.Fill = Brush $dc }
 }
 
+function Clamp-Window([double]$x, [double]$y, [double]$w, [double]$h) {
+    $area = [System.Windows.SystemParameters]::WorkArea
+    $x = [Math]::Max($area.Left, [Math]::Min($x, $area.Right - $w))
+    $y = [Math]::Max($area.Top, [Math]::Min($y, $area.Bottom - $h))
+    return @($x, $y)
+}
+
 function Set-Mode([bool]$collapsed, $state) {
     $area = [System.Windows.SystemParameters]::WorkArea
     if ($collapsed) {
         $script:Window.FindName('Panel').Visibility = 'Collapsed'
         $script:Window.FindName('Ball').Visibility = 'Visible'
-        $script:Window.Width = 52; $script:Window.Height = 52
-        $x = if ($script:Layout.ballX -ge 0) { $script:Layout.ballX } else { $script:Layout.panelX }
-        $y = if ($script:Layout.ballY -ge 0) { $script:Layout.ballY } else { $script:Layout.panelY }
-        if ($x -lt 0) { $x = $area.Left + $area.Width - 52 - 28 }
-        if ($y -lt 0) { $y = $area.Top + 28 }
-        $script:Window.Left = [Math]::Max($area.Left, $x); $script:Window.Top = [Math]::Max($area.Top, $y)
+        $script:Window.Width = $script:BallSize; $script:Window.Height = $script:BallSize
+        # The collapse control lives at the panel's TOP-RIGHT. The ball must
+        # occupy that same visual point, never the panel's top-left.
+        if ($script:Layout.ballX -ge 0) {
+            $x = $script:Layout.ballX
+            $y = $script:Layout.ballY
+        } else {
+            $panelX = if ($script:Layout.panelX -ge 0) { $script:Layout.panelX } else { $area.Left + $area.Width - $script:PanelW - $script:Edge }
+            $panelY = if ($script:Layout.panelY -ge 0) { $script:Layout.panelY } else { $area.Top + $script:Edge }
+            $x = $panelX + $script:PanelW - $script:BallSize
+            $y = $panelY
+        }
+        $pos = Clamp-Window $x $y $script:BallSize $script:BallSize
+        $script:Window.Left = $pos[0]; $script:Window.Top = $pos[1]
     } else {
         $script:Window.FindName('Panel').Visibility = 'Visible'
         $script:Window.FindName('Ball').Visibility = 'Collapsed'
-        $script:Window.Width = 560; $script:Window.Height = 300
-        $x = if ($script:Layout.panelX -ge 0) { $script:Layout.panelX } else { $area.Left + $area.Width - 560 - 28 }
-        $y = if ($script:Layout.panelY -ge 0) { $script:Layout.panelY } else { $area.Top + 28 }
-        $script:Window.Left = [Math]::Max($area.Left, $x); $script:Window.Top = [Math]::Max($area.Top, $y)
+        $script:Window.Width = $script:PanelW; $script:Window.Height = $script:PanelH
+        # The expand handler already maps the ball's top-right to panelX/panelY.
+        # Once expanded we must trust panelX/Y, otherwise dragging the panel
+        # would snap back to the old ball position on the next 300ms tick.
+        $x = if ($script:Layout.panelX -ge 0) { $script:Layout.panelX } else { $area.Left + $area.Width - $script:PanelW - $script:Edge }
+        $y = if ($script:Layout.panelY -ge 0) { $script:Layout.panelY } else { $area.Top + $script:Edge }
+        $pos = Clamp-Window $x $y $script:PanelW $script:PanelH
+        $script:Window.Left = $pos[0]; $script:Window.Top = $pos[1]
     }
 }
 
@@ -252,7 +275,16 @@ try {
         } catch { } finally { $script:Dragging = $false }
     })
 } catch {}
-try { $script:Window.FindName('BtnCollapse').Add_MouseLeftButtonUp({ if ($script:Layout.panelX -ge 0) { $script:Layout.ballX = $script:Layout.panelX; $script:Layout.ballY = $script:Layout.panelY }; $script:Layout.collapsed = $true; Save-Layout; Set-Mode $true $null }) } catch {}
+try { $script:Window.FindName('BtnCollapse').Add_MouseLeftButtonUp({
+    $area = [System.Windows.SystemParameters]::WorkArea
+    $panelX = if ($script:Layout.panelX -ge 0) { $script:Layout.panelX } else { $area.Left + $area.Width - $script:PanelW - $script:Edge }
+    $panelY = if ($script:Layout.panelY -ge 0) { $script:Layout.panelY } else { $area.Top + $script:Edge }
+    $script:Layout.ballX = $panelX + $script:PanelW - $script:BallSize
+    $script:Layout.ballY = $panelY
+    $script:Layout.collapsed = $true
+    Save-Layout
+    Set-Mode $true $null
+}) } catch {}
 try {
     $script:Window.FindName('Ball').Add_MouseLeftButtonDown({
         # Same drag primitive as the panel: a press+drag moves the ball,
@@ -268,7 +300,10 @@ try {
             $script:Layout.ballY = [double]$script:Window.Top
             Save-Layout
         } else {
-            if ($script:Layout.ballX -ge 0) { $script:Layout.panelX = $script:Layout.ballX; $script:Layout.panelY = $script:Layout.ballY }
+            if ($script:Layout.ballX -ge 0) {
+                $script:Layout.panelX = $script:Layout.ballX + $script:BallSize - $script:PanelW
+                $script:Layout.panelY = $script:Layout.ballY
+            }
             $script:Layout.collapsed = $false
             Save-Layout
             Set-Mode $false $null

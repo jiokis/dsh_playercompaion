@@ -49,6 +49,13 @@ test('lore_story exposes summary, search, character, scene and stats', async () 
     const stats = await tool.execute({ action: 'stats' })
     assert.equal(stats.stats.arcs, 1)
     assert.match(stats.text, /梗概阶段：1/)
+    const memory = await tool.execute({ action: 'memory' })
+    assert.equal(memory.memory.scenes.length, 1)
+    assert.ok(memory.memory.characters.length >= 1)
+    const context = await tool.execute({ action: 'context', limit: 2 })
+    assert.equal(context.context.scene.title, '第一幕')
+    assert.equal(context.context.recent.length, 2)
+    assert.match(context.prompt, /只使用下面这份本地录制记忆/)
   } finally {
     rmSync(dataDir, { recursive: true, force: true })
   }

@@ -268,7 +268,7 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - The Journal adds a **Synopsis** tab; data at `<dataDir>/journal/synopsis.json`.
 - Only recorded text is used; OCR-uncertain items are marked.
 
-## 0.15.0 fixes
+## 0.16.0 fixes
 
 - Overlay commands are now BOM-less UTF-8, and Node accepts a BOM too; screenshot/analyze/read/query/force commands are no longer silently dropped.
 - `PUNCT_ONLY`: a silent character showing only an ellipsis is kept even at low OCR confidence.
@@ -281,9 +281,17 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - `text` is plain text ready to send to QQ.
 - The QQ bridge guard (`plugins/qq-agent-presets/qq-tool-restrict.mjs`) allows `lore_story`; restart the bridge or create a new QQ session for the schema to refresh.
 
-## 0.15.0 UI
+## 0.16.0 UI
 
 - Reading-first Journal: hero header, session/time pills, four stat cards, sticky segmented tabs.
 - Synopsis: chapter index, timeline nodes, scene cards, and a jump-to-chapter interaction.
 - Screenshots, event cards, and character cards share the refined gradient/border surface; focus-visible and reduced-motion are respected.
 - In-game overlay: deep-blue gradient, soft border, glowing status dot, and roomier body line height.
+
+## 0.16.0 anchor and memory
+
+- Collapse/expand keeps the top-right anchor: the ball sits at the panel's top-right and the panel grows left/down; dragging no longer snaps back on the 300ms tick.
+- Low-confidence OCR (<0.62) gets one 1.5x upscaled re-read; the higher-score/more-complete result wins.
+- Structured memory at `journal/memory.json`: scenes, characters, relationships, unresolved threads, recent lines. `lore_story` adds `memory` and `context`.
+- `context` returns current scene, recent dialogue, active characters, threads and a guarded companion prompt.
+- Research and roadmap: [docs/REALTIME-COMPANION.md](docs/REALTIME-COMPANION.md).
