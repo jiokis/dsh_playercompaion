@@ -268,7 +268,7 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - The Journal adds a **Synopsis** tab; data at `<dataDir>/journal/synopsis.json`.
 - Only recorded text is used; OCR-uncertain items are marked.
 
-## 0.14.0 fixes
+## 0.15.0 fixes
 
 - Overlay commands are now BOM-less UTF-8, and Node accepts a BOM too; screenshot/analyze/read/query/force commands are no longer silently dropped.
 - `PUNCT_ONLY`: a silent character showing only an ellipsis is kept even at low OCR confidence.
@@ -280,3 +280,10 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - `summary` returns the nine-arc story synopsis; `search` finds lines; `character` aggregates a speaker; `scene` finds an arc; `recent` returns latest lines; `stats` returns counts.
 - `text` is plain text ready to send to QQ.
 - The QQ bridge guard (`plugins/qq-agent-presets/qq-tool-restrict.mjs`) allows `lore_story`; restart the bridge or create a new QQ session for the schema to refresh.
+
+## 0.15.0 UI
+
+- Reading-first Journal: hero header, session/time pills, four stat cards, sticky segmented tabs.
+- Synopsis: chapter index, timeline nodes, scene cards, and a jump-to-chapter interaction.
+- Screenshots, event cards, and character cards share the refined gradient/border surface; focus-visible and reduced-motion are respected.
+- In-game overlay: deep-blue gradient, soft border, glowing status dot, and roomier body line height.

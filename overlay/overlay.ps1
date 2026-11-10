@@ -72,8 +72,14 @@ $xaml = @"
         ResizeMode="NoResize" WindowStartupLocation="Manual" Opacity="0"
         FontFamily="Microsoft YaHei UI" UseLayoutRounding="True" SnapsToDevicePixels="True">
   <Grid>
-    <Border x:Name="Panel" CornerRadius="16" Background="#F2141720" BorderBrush="#3A2A3140" BorderThickness="1">
-      <Border.Effect><DropShadowEffect BlurRadius="28" ShadowDepth="0" Opacity="0.5" Color="#000000"/></Border.Effect>
+    <Border x:Name="Panel" CornerRadius="16" BorderBrush="#4A334A6A" BorderThickness="1">
+      <Border.Background>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+          <GradientStop Color="#F2171D2A" Offset="0"/>
+          <GradientStop Color="#F20D1017" Offset="1"/>
+        </LinearGradientBrush>
+      </Border.Background>
+      <Border.Effect><DropShadowEffect BlurRadius="30" ShadowDepth="0" Opacity="0.55" Color="#000000"/></Border.Effect>
       <Grid Margin="18,14,18,12">
         <Grid.RowDefinitions>
           <RowDefinition Height="34"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/>
@@ -90,7 +96,7 @@ $xaml = @"
           </StackPanel>
           <Border x:Name="StatusPill" Grid.Column="2" Background="#182235" BorderBrush="#2A3C5E" BorderThickness="1" CornerRadius="10" Padding="7,3" VerticalAlignment="Center" Margin="0,0,8,0">
             <StackPanel Orientation="Horizontal">
-              <Ellipse x:Name="Dot" Width="6" Height="6" Fill="#7EA2FF" VerticalAlignment="Center" Margin="0,0,5,0"/>
+              <Ellipse x:Name="Dot" Width="6" Height="6" Fill="#7EA2FF" VerticalAlignment="Center" Margin="0,0,5,0"><Ellipse.Effect><DropShadowEffect BlurRadius="8" ShadowDepth="0" Opacity="0.9" Color="#7EA2FF"/></Ellipse.Effect></Ellipse>
               <TextBlock x:Name="Status" Foreground="#9DB7FF" FontSize="10" MaxWidth="130" TextTrimming="CharacterEllipsis"/>
             </StackPanel>
           </Border>
@@ -104,7 +110,7 @@ $xaml = @"
           </Border>
           <TextBlock x:Name="SpeakerTitle" Foreground="#8A94A6" FontSize="10.5" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Visibility="Collapsed"/>
         </StackPanel>
-        <TextBlock x:Name="Body" Grid.Row="2" Foreground="#F2F5FA" FontSize="15" LineHeight="23" TextWrapping="Wrap" Margin="0,9,0,0" MaxHeight="92"/>
+        <TextBlock x:Name="Body" Grid.Row="2" Foreground="#F2F5FA" FontSize="15.5" LineHeight="24" TextWrapping="Wrap" Margin="0,10,0,0" MaxHeight="104"/>
         <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,9,0,0">
           <Border x:Name="BtnShot" Background="#182235" BorderBrush="#2A3C5E" BorderThickness="1" CornerRadius="8" Padding="11,5" Margin="0,0,7,0" Cursor="Hand"><TextBlock Text="截图" Foreground="#A9C1FF" FontSize="11.5"/></Border>
           <Border x:Name="BtnAnalyze" Background="#182235" BorderBrush="#2A3C5E" BorderThickness="1" CornerRadius="8" Padding="11,5" Margin="0,0,7,0" Cursor="Hand"><TextBlock Text="分析" Foreground="#A9C1FF" FontSize="11.5"/></Border>

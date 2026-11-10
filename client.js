@@ -160,6 +160,90 @@ window.__ModuleLoader__.load({
       ".lc-j-unresolved{margin-top:18px;border:1px solid #3a2f20;background:#1c1710;border-radius:9px;padding:10px 14px;color:#bfae8c;font-size:11.5px;line-height:1.7}.lc-j-unresolved b{color:#e8c47a}.lc-j-unresolved ul{margin:5px 0 0 18px;padding:0}",
       "@media (max-width:760px){.lc-j-shot-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}",
       "@media (max-width:760px){.lc-j-stats{grid-template-columns:repeat(2,1fr)}.lc-j-grid{grid-template-columns:1fr}.lc-j-line-speaker{width:64px}.lc-j-line-name{max-width:40px}}",
+      `
+      .lc-journal{gap:18px;padding:20px 24px 38px;max-width:1180px;background:radial-gradient(ellipse at 18% -8%,rgba(86,116,255,.10),transparent 42%),radial-gradient(ellipse at 96% 4%,rgba(232,196,122,.055),transparent 34%)}
+      .lc-j-hero{position:relative;overflow:hidden;border:1px solid rgba(94,122,180,.24);border-radius:18px;background:linear-gradient(135deg,rgba(38,52,88,.78),rgba(15,20,30,.92) 55%,rgba(40,34,26,.72));box-shadow:0 18px 50px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.05);padding:20px 22px 14px}
+      .lc-j-hero:before{content:"";position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,rgba(139,165,255,.7),rgba(232,196,122,.55),transparent)}
+      .lc-j-hero-glow{position:absolute;width:280px;height:280px;right:-90px;top:-150px;border-radius:50%;background:radial-gradient(circle,rgba(111,141,255,.20),transparent 68%);pointer-events:none}
+      .lc-j-hero-top{position:relative;display:flex;align-items:flex-start;justify-content:space-between;gap:18px;flex-wrap:wrap}
+      .lc-j-ident{display:flex;align-items:center;gap:12px;min-width:240px}
+      .lc-j-seal{width:46px;height:46px;flex:none;display:flex;align-items:center;justify-content:center;border-radius:14px;background:linear-gradient(145deg,#7896ff,#3b56c8 60%,#9a7a45);color:#0b1019;font-size:22px;font-weight:750;box-shadow:0 8px 22px rgba(69,96,220,.28),inset 0 1px rgba(255,255,255,.35)}
+      .lc-j-kicker{font-size:9px;letter-spacing:.16em;color:#8194bd;text-transform:uppercase;margin-bottom:3px}
+      .lc-j-title{font-size:25px;line-height:1.15;font-weight:680;letter-spacing:-.035em;color:#f4f7ff}
+      .lc-j-sub{font-size:10.5px;color:#8390a6;margin-top:3px;letter-spacing:.01em}
+      .lc-j-hero-meta{position:relative;display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.055)}
+      .lc-j-pill{display:inline-flex;align-items:center;height:22px;padding:0 8px;border:1px solid rgba(131,151,190,.20);border-radius:999px;background:rgba(255,255,255,.035);color:#a8b6cb;font-size:9.5px;white-space:nowrap;letter-spacing:.01em}
+      .lc-j-pill-gold{border-color:rgba(232,196,122,.32);background:rgba(232,196,122,.08);color:#e8c47a}
+      .lc-j-pill-dim{color:#6f7c91;border-color:rgba(120,137,163,.14)}
+      .lc-j-pill-live{color:#8fe3b0;border-color:rgba(78,216,154,.22);background:rgba(78,216,154,.055)}
+      .lc-j-pill-live:before{content:"";width:4px;height:4px;border-radius:50%;background:#8fe3b0;margin-right:5px;box-shadow:0 0 8px rgba(143,227,176,.7)}
+      .lc-j-tools{gap:7px;align-items:center;justify-content:flex-end}
+      .lc-j-select,.lc-j-input{height:32px;border-radius:9px;border:1px solid rgba(119,139,173,.24);background:rgba(9,13,21,.48);color:#cbd7ea;padding:0 9px;font-size:11px;transition:border-color .15s,background .15s}
+      .lc-j-select:hover,.lc-j-input:hover{border-color:rgba(111,141,255,.5);background:rgba(18,25,38,.7)}
+      .lc-j-select:focus,.lc-j-input:focus{border-color:#6f8dff;box-shadow:0 0 0 3px rgba(111,141,255,.12)}
+      .lc-j-btn{height:32px;border-radius:9px;border:1px solid rgba(119,139,173,.22);background:rgba(255,255,255,.035);color:#b8c5d9;padding:0 11px;font-size:11px;transition:border-color .15s,background .15s,color .15s}
+      .lc-j-btn:hover{border-color:rgba(111,141,255,.6);background:rgba(111,141,255,.10);color:#f0f4ff}
+      .lc-j-btn-quiet{color:#7e8ca2;background:transparent;border-color:transparent}
+      .lc-j-btn-quiet:hover{border-color:rgba(119,139,173,.25);background:rgba(255,255,255,.04)}
+      .lc-j-stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+      .lc-j-stat{position:relative;overflow:hidden;border:1px solid rgba(119,139,173,.18);border-radius:13px;background:linear-gradient(145deg,rgba(27,36,53,.75),rgba(15,20,29,.8));padding:12px 14px;box-shadow:inset 0 1px rgba(255,255,255,.035)}
+      .lc-j-stat:after{content:"";position:absolute;left:12px;bottom:0;width:30px;height:1px;background:linear-gradient(90deg,#6f8dff,transparent)}
+      .lc-j-stat i{position:absolute;right:9px;top:7px;font-style:normal;font-size:17px;color:rgba(139,165,255,.16);line-height:1}
+      .lc-j-stat b{display:block;font-size:23px;color:#e8eeff;letter-spacing:-.03em}
+      .lc-j-stat span{display:block;font-size:10px;color:#7f8ea4;letter-spacing:.04em}
+      .lc-j-stat-gold:after{background:linear-gradient(90deg,#e8c47a,transparent)}.lc-j-stat-gold i{color:rgba(232,196,122,.18)}.lc-j-stat-gold b{color:#f3dfb2}
+      .lc-j-stat-mint:after{background:linear-gradient(90deg,#8fe3b0,transparent)}.lc-j-stat-mint i{color:rgba(143,227,176,.16)}.lc-j-stat-mint b{color:#c7f4db}
+      .lc-j-stat-dim i{color:rgba(160,174,196,.12)}
+      .lc-j-tabs{position:sticky;top:0;z-index:30;display:flex;gap:4px;padding:5px;border:1px solid rgba(119,139,173,.16);border-radius:12px;background:rgba(12,17,26,.84);backdrop-filter:blur(14px);box-shadow:0 8px 22px rgba(0,0,0,.18)}
+      .lc-j-tab{display:inline-flex;align-items:center;gap:6px;border:none;border-radius:8px;padding:7px 11px;color:#76859b;font-size:11px;transition:background .15s,color .15s,box-shadow .15s;white-space:nowrap}
+      .lc-j-tab:hover{color:#cbd7ea;background:rgba(255,255,255,.045)}
+      .lc-j-tab.active{color:#eaf0ff;background:linear-gradient(135deg,rgba(91,124,255,.30),rgba(71,91,150,.22));box-shadow:inset 0 0 0 1px rgba(126,153,255,.32),0 4px 14px rgba(45,68,160,.18)}
+      .lc-j-tab-icon{font-size:12px;color:#7f9cff;opacity:.9}
+      .lc-j-tab.active .lc-j-tab-icon{color:#dce6ff}
+      .lc-j-tab-count{min-width:15px;height:15px;display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:rgba(255,255,255,.09);color:#aebbd0;font-size:8.5px;padding:0 4px}
+      .lc-j-reading{max-width:920px}
+      .lc-j-syn-hero{position:relative;overflow:hidden;border:1px solid rgba(119,139,173,.20);border-radius:17px;background:linear-gradient(150deg,rgba(34,44,68,.72),rgba(16,21,31,.86));padding:20px 22px 18px;box-shadow:0 14px 36px rgba(0,0,0,.16)}
+      .lc-j-syn-hero:before{content:"";position:absolute;left:0;top:0;width:3px;height:100%;background:linear-gradient(180deg,#e8c47a,#6f8dff,transparent)}
+      .lc-j-syn-kicker{font-size:9px;letter-spacing:.17em;color:#8fa4c8;margin-bottom:6px}
+      .lc-j-syn-title{font-size:28px;line-height:1.25;letter-spacing:-.035em;color:#f4f7ff;margin:0 0 9px;font-weight:680}
+      .lc-j-syn-meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+      .lc-j-syn-overview{color:#c3cfe1;font-size:13px;line-height:1.85;padding:12px 14px;border-left:2px solid rgba(232,196,122,.75);background:linear-gradient(90deg,rgba(232,196,122,.06),transparent);border-radius:0 9px 9px 0}
+      .lc-j-toc{margin-top:15px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06);display:flex;flex-wrap:wrap;gap:5px}
+      .lc-j-toc-label{width:100%;font-size:9px;letter-spacing:.12em;color:#718097;margin-bottom:1px}
+      .lc-j-toc-item{display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(119,139,173,.16);border-radius:7px;background:rgba(255,255,255,.02);color:#94a5bd;padding:4px 7px;font:inherit;font-size:9.5px;cursor:pointer;max-width:100%}
+      .lc-j-toc-item:hover{border-color:rgba(111,141,255,.45);color:#dbe5f7;background:rgba(111,141,255,.07)}
+      .lc-j-toc-item span{font-size:8px;color:#6f8dff;font-variant-numeric:tabular-nums}.lc-j-toc-item b{font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .lc-j-arc-list{position:relative;margin-top:20px}
+      .lc-j-arc-list:before{content:"";position:absolute;left:25px;top:8px;bottom:18px;width:1px;background:linear-gradient(180deg,rgba(111,141,255,.45),rgba(111,141,255,.10))}
+      .lc-j-arc{position:relative;display:grid;grid-template-columns:52px minmax(0,1fr);gap:14px;padding:0 0 18px;border-top:none;animation:lc-rise .45s ease both}
+      .lc-j-arc-node{position:relative;z-index:1;width:35px;height:35px;margin:2px 0 0 9px;display:flex;align-items:center;justify-content:center;border-radius:50%;border:1px solid rgba(111,141,255,.35);background:#121a2a;color:#a9bcff;font-size:9.5px;font-variant-numeric:tabular-nums;box-shadow:0 0 0 5px rgba(111,141,255,.055)}
+      .lc-j-arc-body{border:1px solid rgba(119,139,173,.16);border-radius:13px;background:linear-gradient(145deg,rgba(25,33,48,.66),rgba(15,20,29,.74));padding:13px 15px 12px;transition:border-color .18s,background .18s,transform .18s}
+      .lc-j-arc-body:hover{border-color:rgba(111,141,255,.35);background:linear-gradient(145deg,rgba(31,41,61,.76),rgba(16,22,33,.82));transform:translateY(-1px)}
+      .lc-j-arc-head{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+      .lc-j-arc-eyebrow{font-size:8px;letter-spacing:.13em;color:#6684d8}
+      .lc-j-arc-head h3{font-size:15.5px;margin:0;color:#e4ebf8;font-weight:620;letter-spacing:-.01em}
+      .lc-j-arc-range{font-size:9px;color:#69788e;margin-left:auto;font-variant-numeric:tabular-nums}
+      .lc-j-arc-summary{font-size:12.5px;line-height:1.8;color:#a4b2c6;margin:7px 0 3px}
+      .lc-j-arc-beats{margin:5px 0 3px;padding:0;list-style:none;color:#c4d0e1;font-size:11.5px;line-height:1.7}
+      .lc-j-arc-beats li{position:relative;padding-left:12px}.lc-j-arc-beats li:before{content:"";position:absolute;left:1px;top:.72em;width:4px;height:4px;border-radius:50%;background:#6f8dff;opacity:.65}
+      .lc-j-arc-chars{display:flex;flex-wrap:wrap;gap:4px;margin:7px 0 0}
+      .lc-j-unresolved{margin:2px 0 0 66px;border:1px solid rgba(184,146,79,.24);background:linear-gradient(145deg,rgba(60,45,24,.44),rgba(25,21,15,.55));border-radius:12px;padding:11px 14px;color:#bfae8c;font-size:11px;line-height:1.75;box-shadow:inset 0 1px rgba(255,255,255,.025)}
+      .lc-j-unresolved b{color:#e8c47a;font-size:10px;letter-spacing:.08em}.lc-j-unresolved ul{margin:5px 0 0 16px;padding:0}
+      .lc-j-empty{border:1px dashed rgba(119,139,173,.2);border-radius:13px;background:rgba(255,255,255,.018);color:#71809a;text-align:center;padding:36px 12px;font-size:11.5px}
+      .lc-j-event{transition:border-color .18s,background .18s,transform .18s}.lc-j-j-event:hover{transform:translateY(-1px)}
+      .lc-j-shot{border-color:rgba(119,139,173,.18);border-radius:13px;background:linear-gradient(145deg,rgba(24,32,46,.78),rgba(14,19,28,.86));box-shadow:0 8px 22px rgba(0,0,0,.12)}
+      .lc-j-shot-img{border-radius:12px 12px 0 0;background:#0b1018}.lc-j-shot:hover .lc-j-shot-del{opacity:1}
+      .lc-j-shot:after{content:"";position:absolute;inset:0 0 auto;height:48%;background:linear-gradient(180deg,transparent,rgba(8,11,17,.30));pointer-events:none}
+      .lc-j-modal{background:rgba(4,7,12,.9);backdrop-filter:blur(10px)}
+      .lc-j-modal img{animation:lc-zoom .22s ease both;box-shadow:0 30px 100px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.08)}
+      .lc-j-card{border-color:rgba(119,139,173,.18);background:linear-gradient(145deg,rgba(25,33,48,.7),rgba(15,20,29,.8));box-shadow:inset 0 1px rgba(255,255,255,.035)}
+      .lc-j-journal .lc-j-btn:focus-visible,.lc-journal .lc-j-tab:focus-visible,.lc-journal .lc-j-toc-item:focus-visible{outline:2px solid #8fa9ff;outline-offset:2px}
+      @keyframes lc-rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+      @keyframes lc-zoom{from{opacity:0;transform:scale(.985)}to{opacity:1;transform:none}}
+      @media (max-width:820px){.lc-j-hero{padding:16px 16px 12px}.lc-j-title{font-size:22px}.lc-j-tools{justify-content:flex-start}.lc-j-syn-title{font-size:23px}.lc-j-arc{grid-template-columns:42px minmax(0,1fr);gap:9px}.lc-j-arc-node{width:29px;height:29px;margin-left:6px;font-size:8.5px}.lc-j-arc-list:before{left:20px}.lc-j-unresolved{margin-left:51px}.lc-j-tabs{overflow-x:auto}}
+      @media (max-width:640px){.lc-journal{padding:14px 13px 28px}.lc-j-ident{gap:9px}.lc-j-seal{width:38px;height:38px;border-radius:11px;font-size:18px}.lc-j-title{font-size:20px}.lc-j-sub{font-size:9.5px}.lc-j-syn-hero{padding:16px 14px}.lc-j-syn-title{font-size:20px}.lc-j-syn-overview{font-size:12px;padding:10px 11px}.lc-j-arc{grid-template-columns:1fr}.lc-j-arc-node{display:none}.lc-j-arc-list:before{display:none}.lc-j-unresolved{margin-left:0}.lc-j-arc-range{margin-left:0;width:100%}}
+      @media (prefers-reduced-motion:reduce){.lc-j-arc{animation:none}.lc-j-modal img{animation:none}.lc-j-arc-body:hover{transform:none}}
+      `,
       "@media (max-width:640px){.lc-grid{grid-template-columns:1fr}.lc-hero{padding:14px}}"
     ].join("");
 
@@ -737,16 +821,33 @@ window.__ModuleLoader__.load({
         load(game, "", 300);
         try { window.scrollTo(0, 0); } catch (error) { /* ignore */ }
       };
-      var header = h("div", { className: "lc-j-head" },
-        h("div", null,
-          h("div", { className: "lc-j-title" }, "旅途记录"),
-          h("div", { className: "lc-j-sub" }, "本地 OCR · 只读 · 事件按时间间隔分段，梗概取自原文")
+      var heroSession = snapshot ? (snapshot.session || "latest") : "读取中";
+      var heroFirst = snapshot && snapshot.entries && snapshot.entries.length ? snapshot.entries[0].ts : null;
+      var heroLast = snapshot && snapshot.entries && snapshot.entries.length ? snapshot.entries[snapshot.entries.length - 1].ts : null;
+      var header = h("div", { className: "lc-j-hero" },
+        h("div", { className: "lc-j-hero-glow" }),
+        h("div", { className: "lc-j-hero-top" },
+          h("div", { className: "lc-j-ident" },
+            h("div", { className: "lc-j-seal" }, "旅"),
+            h("div", null,
+              h("div", { className: "lc-j-kicker" }, "LORE COMPANION / LOCAL OCR"),
+              h("div", { className: "lc-j-title" }, "旅途记录"),
+              h("div", { className: "lc-j-sub" }, "只读存档 · 事件自动分段 · 本地识别")
+            )
+          ),
+          h("div", { className: "lc-j-tools" }, gameSelect, sessionSelect, limitSelect,
+            h("button", { className: "lc-j-btn", type: "button", onClick: function () { load(game, snapshot ? snapshot.session : "", limit); } }, "刷新"),
+            h("button", { className: "lc-j-btn lc-j-btn-quiet", type: "button", onClick: resetJournal }, "重置"),
+            snapshot ? h("button", { className: "lc-j-btn lc-j-btn-quiet", type: "button", title: "导出 Markdown", onClick: function () { downloadText("旅途记录-" + (snapshot.session || snapshot.game) + ".md", journalMarkdown(snapshot, gameLabel), "text/markdown;charset=utf-8"); } }, "MD") : null,
+            snapshot ? h("button", { className: "lc-j-btn lc-j-btn-quiet", type: "button", title: "导出 JSON", onClick: function () { downloadText("旅途记录-" + (snapshot.session || snapshot.game) + ".json", JSON.stringify(snapshot, null, 2), "application/json;charset=utf-8"); } }, "JSON") : null
+          )
         ),
-        h("div", { className: "lc-j-tools" }, gameSelect, sessionSelect, limitSelect,
-          h("button", { className: "lc-j-btn", type: "button", onClick: function () { load(game, snapshot ? snapshot.session : "", limit); } }, "刷新"),
-          h("button", { className: "lc-j-btn", type: "button", onClick: resetJournal }, "重置视图"),
-          snapshot ? h("button", { className: "lc-j-btn", type: "button", onClick: function () { downloadText("旅途记录-" + (snapshot.session || snapshot.game) + ".md", journalMarkdown(snapshot, gameLabel), "text/markdown;charset=utf-8"); } }, "导出 MD") : null,
-          snapshot ? h("button", { className: "lc-j-btn", type: "button", onClick: function () { downloadText("旅途记录-" + (snapshot.session || snapshot.game) + ".json", JSON.stringify(snapshot, null, 2), "application/json;charset=utf-8"); } }, "JSON") : null
+        h("div", { className: "lc-j-hero-meta" },
+          h("span", { className: "lc-j-pill lc-j-pill-gold" }, gameLabel[game] || "原神"),
+          h("span", { className: "lc-j-pill" }, heroSession),
+          snapshot ? h("span", { className: "lc-j-pill" }, (snapshot.entries || []).length + " 行") : null,
+          heroFirst ? h("span", { className: "lc-j-pill lc-j-pill-dim" }, fmtDay(heroFirst) + " " + fmtClock(heroFirst) + " → " + fmtClock(heroLast)) : null,
+          h("span", { className: "lc-j-pill lc-j-pill-live" }, "本地 · 只读")
         )
       );
 
@@ -759,19 +860,32 @@ window.__ModuleLoader__.load({
 
       var stats = snapshot.stats || { lines: 0, characters: 0, events: 0, sessions: 0 };
       var statsRow = h("div", { className: "lc-j-stats" },
-        h("div", { className: "lc-j-stat" }, h("b", null, String(stats.lines)), h("span", null, "对话行")),
-        h("div", { className: "lc-j-stat" }, h("b", null, String(stats.characters)), h("span", null, "出场人物")),
-        h("div", { className: "lc-j-stat" }, h("b", null, String(stats.events)), h("span", null, "事件段")),
-        h("div", { className: "lc-j-stat" }, h("b", null, String(stats.sessions)), h("span", null, "记录场次"))
+        h("div", { className: "lc-j-stat lc-j-stat-blue" }, h("i", null, "◈"), h("b", null, String(stats.lines)), h("span", null, "对话行")),
+        h("div", { className: "lc-j-stat lc-j-stat-gold" }, h("i", null, "◎"), h("b", null, String(stats.characters)), h("span", null, "出场人物")),
+        h("div", { className: "lc-j-stat lc-j-stat-mint" }, h("i", null, "◇"), h("b", null, String(stats.events)), h("span", null, "事件段")),
+        h("div", { className: "lc-j-stat lc-j-stat-dim" }, h("i", null, "▤"), h("b", null, String(stats.sessions)), h("span", null, "记录场次"))
       );
 
       var shotCount = (snapshot.screenshots || []).length;
-      var tabs = h("div", { className: "lc-j-tabs" },
-        snapshot.synopsis ? h("button", { className: "lc-j-tab" + (tab === "synopsis" ? " active" : ""), type: "button", onClick: function () { setTab("synopsis"); } }, "剧情梗概") : null,
-        snapshot.curated ? h("button", { className: "lc-j-tab" + (tab === "curated" ? " active" : ""), type: "button", onClick: function () { setTab("curated"); } }, "整理稿") : null,
-        h("button", { className: "lc-j-tab" + (tab === "overview" ? " active" : ""), type: "button", onClick: function () { setTab("overview"); } }, "人物与事件"),
-        h("button", { className: "lc-j-tab" + (tab === "dialogue" ? " active" : ""), type: "button", onClick: function () { setTab("dialogue"); } }, "详细对话"),
-        h("button", { className: "lc-j-tab" + (tab === "screenshots" ? " active" : ""), type: "button", onClick: function () { setTab("screenshots"); } }, "截图" + (shotCount ? " " + shotCount : ""))
+      var tabButton = function (key, label, icon, count) {
+        return h("button", {
+          className: "lc-j-tab" + (tab === key ? " active" : ""),
+          type: "button",
+          role: "tab",
+          "aria-selected": tab === key ? "true" : "false",
+          onClick: function () { setTab(key); }
+        },
+          h("span", { className: "lc-j-tab-icon", "aria-hidden": "true" }, icon),
+          h("span", null, label),
+          count ? h("span", { className: "lc-j-tab-count" }, String(count)) : null
+        );
+      };
+      var tabs = h("div", { className: "lc-j-tabs", role: "tablist", "aria-label": "旅途视图" },
+        snapshot.synopsis ? tabButton("synopsis", "剧情梗概", "◇") : null,
+        snapshot.curated ? tabButton("curated", "整理稿", "✦") : null,
+        tabButton("overview", "人物与事件", "◎"),
+        tabButton("dialogue", "详细对话", "≡"),
+        tabButton("screenshots", "截图", "▧", shotCount || null)
       );
 
       if (!snapshot.entries.length) {
@@ -956,27 +1070,60 @@ window.__ModuleLoader__.load({
           }, "删除")
         );
       })) : h("div", { className: "lc-j-empty" }, "还没有截图。在悬浮窗点「截图」会保存到这里。");
+      var jumpToArc = function (id) {
+        try {
+          var node = document.getElementById(id);
+          if (node && typeof node.scrollIntoView === "function") node.scrollIntoView({ behavior: "smooth", block: "start" });
+        } catch (error) { /* scrolling is best effort */ }
+      };
       var synopsis = snapshot.synopsis || null;
-      var synopsisView = synopsis ? h("div", { className: "lc-j-synopsis" },
-        h("div", { className: "lc-j-curated-eyebrow" }, "全片剧情梗概 · " + (synopsis.period || "本场录制")),
-        h("h2", { className: "lc-j-curated-title" }, synopsis.title || "录制剧情梗概"),
-        synopsis.overview ? h("div", { className: "lc-j-synopsis-overview" }, synopsis.overview) : null,
-        (synopsis.arcs || []).map(function (arc, index) {
-          return h("section", { className: "lc-j-arc", key: arc.id || index },
-            h("div", { className: "lc-j-arc-head" },
-              h("span", { className: "lc-j-curated-index" }, String(index + 1).padStart(2, "0")),
-              h("h3", null, arc.title || "剧情段落"),
-              arc.range ? h("span", { className: "lc-j-arc-range" }, arc.range) : null
-            ),
-            arc.summary ? h("p", { className: "lc-j-arc-summary" }, arc.summary) : null,
-            Array.isArray(arc.keyBeats) && arc.keyBeats.length
-              ? h("ul", { className: "lc-j-arc-beats" }, arc.keyBeats.map(function (beat, beatIndex) { return h("li", { key: beatIndex }, beat); }))
-              : null,
-            Array.isArray(arc.characters) && arc.characters.length
-              ? h("div", { className: "lc-j-arc-chars" }, arc.characters.map(function (name, charIndex) { return h("span", { className: "lc-j-choice", key: charIndex }, name); }))
-              : null
-          );
-        }),
+      var synopsisArcs = synopsis && Array.isArray(synopsis.arcs) ? synopsis.arcs : [];
+      var synopsisView = synopsis ? h("div", { className: "lc-j-synopsis lc-j-reading" },
+        h("section", { className: "lc-j-syn-hero" },
+          h("div", { className: "lc-j-syn-kicker" }, "MAIN STORY / 全片梗概"),
+          h("h2", { className: "lc-j-syn-title" }, synopsis.title || "录制剧情梗概"),
+          h("div", { className: "lc-j-syn-meta" },
+            h("span", { className: "lc-j-pill lc-j-pill-gold" }, synopsis.period || "本次录制"),
+            h("span", { className: "lc-j-pill" }, synopsisArcs.length + " 个阶段"),
+            synopsis.source && synopsis.source.cleanedLines ? h("span", { className: "lc-j-pill" }, synopsis.source.cleanedLines + " 行清理文本") : null,
+            h("span", { className: "lc-j-pill lc-j-pill-dim" }, "minimax 整理")
+          ),
+          synopsis.overview ? h("div", { className: "lc-j-syn-overview" }, synopsis.overview) : null,
+          synopsisArcs.length ? h("div", { className: "lc-j-toc", "aria-label": "章节导航" },
+            h("div", { className: "lc-j-toc-label" }, "章节"),
+            synopsisArcs.map(function (arc, index) {
+              var target = "lc-arc-" + String(arc.id || index);
+              return h("button", {
+                className: "lc-j-toc-item",
+                type: "button",
+                key: target,
+                onClick: function () { jumpToArc(target); }
+              }, h("span", null, String(index + 1).padStart(2, "0")), h("b", null, arc.title || "剧情段落"));
+            })
+            ) : null
+        ),
+        h("div", { className: "lc-j-arc-list" },
+          synopsisArcs.map(function (arc, index) {
+            var target = "lc-arc-" + String(arc.id || index);
+            return h("section", { className: "lc-j-arc", id: target, key: target },
+              h("div", { className: "lc-j-arc-node", "aria-hidden": "true" }, String(index + 1).padStart(2, "0")),
+              h("div", { className: "lc-j-arc-body" },
+                h("div", { className: "lc-j-arc-head" },
+                  h("div", { className: "lc-j-arc-eyebrow" }, "SCENE " + String(index + 1).padStart(2, "0")),
+                  h("h3", null, arc.title || "剧情段落"),
+                  arc.range ? h("span", { className: "lc-j-arc-range" }, arc.range) : null
+                ),
+                arc.summary ? h("p", { className: "lc-j-arc-summary" }, arc.summary) : null,
+                Array.isArray(arc.keyBeats) && arc.keyBeats.length
+                  ? h("ul", { className: "lc-j-arc-beats" }, arc.keyBeats.map(function (beat, beatIndex) { return h("li", { key: beatIndex }, beat); }))
+                  : null,
+                Array.isArray(arc.characters) && arc.characters.length
+                  ? h("div", { className: "lc-j-arc-chars" }, arc.characters.map(function (name, charIndex) { return h("span", { className: "lc-j-choice", key: charIndex }, name); }))
+                  : null
+              )
+            );
+          })
+        ),
         Array.isArray(synopsis.unresolved) && synopsis.unresolved.length
           ? h("div", { className: "lc-j-unresolved" }, h("b", null, "未解决 / 存疑"), h("ul", null, synopsis.unresolved.map(function (item, index) { return h("li", { key: index }, item); })))
           : null
