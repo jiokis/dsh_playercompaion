@@ -385,7 +385,7 @@ DSH 会话顶部新增「旅途」视图（在「对话 / 轨迹」后面）：
 - 「旅途」新增「剧情梗概」tab；数据在 `<dataDir>/journal/synopsis.json`。
 - 梗概只依据录制文本，标注 OCR 存疑；不补写未记录的剧情。
 
-## 0.17.0 修复
+## 0.18.0 修复
 
 - 悬浮窗按钮命令改为无 BOM UTF-8，Node 同时兼容 BOM；截图/分析/阅读/查找/强制不再被静默丢弃。
 - 新增 `PUNCT_ONLY`：角色沉默只显示「……」时，低置信度省略号不再被短行过滤器删除，可正常记录。
@@ -398,14 +398,14 @@ DSH 会话顶部新增「旅途」视图（在「对话 / 轨迹」后面）：
 - 返回的 `text` 是可直接发到 QQ 的纯文本。
 - QQ 桥接的 `plugins/qq-agent-presets/qq-tool-restrict.mjs` 已放行 `lore_story`；需要重启 QQ 桥接或新建会话让工具 schema 生效。
 
-## 0.17.0 界面
+## 0.18.0 界面
 
 - 旅途页改成阅读型布局：顶部英雄区、场次/时间胶囊、四个统计卡、吸顶分段导航。
 - 剧情梗概增加章节索引、时间线节点、场景卡和阅读排版；点击章节可直接跳转。
 - 截图、事件卡、人物卡统一细边框/渐变表面；支持键盘焦点与 reduced-motion。
 - 游戏内悬浮窗改为深蓝渐变、柔和描边、状态光点和更宽松的正文行高。
 
-## 0.17.0 锚点与记忆
+## 0.18.0 锚点与记忆
 
 - 悬浮窗折叠/展开固定右上角：球停靠面板右上角，展开向左、向下生长；拖动面板后不会在 300ms 刷新时回弹。
 - OCR 低置信度（<0.62）时对裁切区域做 1.5x 放大重识别，保留更高分/更完整结果。
@@ -413,10 +413,17 @@ DSH 会话顶部新增「旅途」视图（在「对话 / 轨迹」后面）：
 - `context` 输出当前阶段、最近对白、在场人物、线索和受控陪玩 prompt。
 - 调研与实时陪玩路线见 [docs/REALTIME-COMPANION.md](docs/REALTIME-COMPANION.md)。
 
-## 0.17.0 主线/世界任务
+## 0.18.0 主线/世界任务
 
 - 新增 `<dataDir>/journal/quests.json` 场次映射：`type=main|world|activity|story`，`name` 为任务名。
 - 示例见 [docs/quests.example.json](docs/quests.example.json)。
 - 旅途顶部显示「主线 · 圣土化」或「世界任务 · 新基捷」徽章。
 - 梗概按场次绑定：选中世界任务场次时不会再把主线的 9 段梗概套过去；世界任务整理稿需要单独生成。
 - 默认打开有主线的场次；世界任务仍可从场次下拉选择。
+
+## 0.18.0 自动速览
+
+- `lore_story` 新增 `action=auto`：按整场日志自动切片，返回场景、人物和抽取式速览，不依赖预先写好的梗概。
+- 星铁可用 `game=hsr`；今天 11/11 场次 2419 行可切成 10 段速览。
+- 新增 [skills/lore-auto-summary/SKILL.md](skills/lore-auto-summary/SKILL.md)：先自动速览，再按需分块润色成正式梗概。
+- `lore_story summary game=hsr` 读取 `<dataDir>/journal/hsr-synopsis.json`，与星铁日志一起使用。

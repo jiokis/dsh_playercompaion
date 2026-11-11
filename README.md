@@ -268,7 +268,7 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - The Journal adds a **Synopsis** tab; data at `<dataDir>/journal/synopsis.json`.
 - Only recorded text is used; OCR-uncertain items are marked.
 
-## 0.17.0 fixes
+## 0.18.0 fixes
 
 - Overlay commands are now BOM-less UTF-8, and Node accepts a BOM too; screenshot/analyze/read/query/force commands are no longer silently dropped.
 - `PUNCT_ONLY`: a silent character showing only an ellipsis is kept even at low OCR confidence.
@@ -281,14 +281,14 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - `text` is plain text ready to send to QQ.
 - The QQ bridge guard (`plugins/qq-agent-presets/qq-tool-restrict.mjs`) allows `lore_story`; restart the bridge or create a new QQ session for the schema to refresh.
 
-## 0.17.0 UI
+## 0.18.0 UI
 
 - Reading-first Journal: hero header, session/time pills, four stat cards, sticky segmented tabs.
 - Synopsis: chapter index, timeline nodes, scene cards, and a jump-to-chapter interaction.
 - Screenshots, event cards, and character cards share the refined gradient/border surface; focus-visible and reduced-motion are respected.
 - In-game overlay: deep-blue gradient, soft border, glowing status dot, and roomier body line height.
 
-## 0.17.0 anchor and memory
+## 0.18.0 anchor and memory
 
 - Collapse/expand keeps the top-right anchor: the ball sits at the panel's top-right and the panel grows left/down; dragging no longer snaps back on the 300ms tick.
 - Low-confidence OCR (<0.62) gets one 1.5x upscaled re-read; the higher-score/more-complete result wins.
@@ -296,10 +296,17 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - `context` returns current scene, recent dialogue, active characters, threads and a guarded companion prompt.
 - Research and roadmap: [docs/REALTIME-COMPANION.md](docs/REALTIME-COMPANION.md).
 
-## 0.17.0 main/world
+## 0.18.0 main/world
 
 - New session map at `<dataDir>/journal/quests.json`: `type=main|world|activity|story`, `name`.
 - Example: [docs/quests.example.json](docs/quests.example.json).
 - The Journal header shows a `Main · ...` / `World · ...` badge.
 - Synopses are bound to a session: a world-quest session no longer inherits the main-story synopsis. A world synopsis must be generated separately.
 - The Journal defaults to the session that has the main synopsis; world sessions remain selectable.
+
+## 0.18.0 auto overview
+
+- `lore_story` adds `action=auto`: chunk a whole session, return scenes/characters and an extractive overview without a pre-written synopsis.
+- Works for HSR with `game=hsr`; today's 11/11 session yields ten chunks over 2,419 lines.
+- New [skills/lore-auto-summary/SKILL.md](skills/lore-auto-summary/SKILL.md): auto overview first, optional chunked polish.
+- `lore_story summary game=hsr` reads `<dataDir>/journal/hsr-synopsis.json`.

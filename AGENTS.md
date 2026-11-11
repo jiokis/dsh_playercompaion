@@ -6,13 +6,13 @@
 
 ## 0. 当前阶段
 
-- v0.17.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch、lore_story。
+- v0.18.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch、lore_story。
 - v1 附带 DSH 设置页（client.js）和游戏内 WPF 悬浮窗（overlay/overlay.ps1）。
 - 多源检索：本地日志、BWIKI、虚空终端 Akasha MCP（akasha_search）、DSH ctx.web.search（DeepSeek Search API）。
 - 图像元素分析 v1.3 alpha：本地 `lore_vision` 已实现 composition/ui/map/semantic 启发式（实时窗口、本地图片或归档 frameId）。
 - 本地语义：mode=semantic 用 OCR 文本 + 几何做场景分类、文字块、POI 邻近标签与建议；不调用模型。
 - 帧归档：可选本地 PNG + JSON（默认关闭），`lore_status` 列最近帧，`lore_vision` 可复分析；VLM/语义地图仍在 ROADMAP.md。
-- v0.17.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
+- v0.18.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
 - 主界面：会话标题栏右侧 `conversation.session.header.actions` 注册「开始记录」胶囊；会话顶部新增「旅途」`conversation.view`，显示人物、人物关系、事件梗概和详细对话。
 - 只读；不注入输入、不读游戏内存、不改游戏文件、不抢焦点、不上传截图或日志。远程检索只发 query/world 等必要参数。
 - 需要子智能体时统一用 **dsh-opencode-go / minimax-m3.1-flash**。插件 v1 不内置子智能体或 LLM 调用。
@@ -175,8 +175,8 @@
 
 ### lore_story
 
-- 参数：action（summary/search/character/scene/recent/stats/memory/context，默认 summary）、query?、game?、session?、limit?（1..20，默认 8）。
-- summary 读取 `<dataDir>/journal/synopsis.json`，返回标题、总纲、9 个阶段和未解决项；scene 按标题/摘要检索阶段；memory 读取/生成 `<dataDir>/journal/memory.json` 的结构化记忆；context 返回当前阶段、最近对白、在场人物、未解决线索和陪玩 prompt。
+- 参数：action（summary/auto/search/character/scene/recent/stats/memory/context，默认 summary）、query?、game?、session?、limit?（1..20，默认 8）。
+- summary 读取 `<dataDir>/journal/synopsis.json`（星铁为 `hsr-synopsis.json`），返回标题、总纲、阶段和未解决项；auto 按整场日志自动切片，返回抽取式速览、场景和人物；scene 按标题/摘要检索阶段；memory 读取/生成 `<dataDir>/journal/memory.json` 的结构化记忆；context 返回当前阶段、最近对白、在场人物、未解决线索和陪玩 prompt。
 - search 走本地日志 `LogStore.query`；character 按说话人（含 OCR 别名）汇总；recent 返回最近台词；stats 返回场次/行数/阶段数。
 - 全部只读、只在本机读取；结果里的 `text` 可直接作为 QQ 回复发送。
 - QQ 桥接的 `qq-tool-restrict` 执行期白名单需放行 `lore_story`。
@@ -275,7 +275,7 @@ Python 测试：
 - 多源：test/sources.test.mjs 覆盖 Akasha MCP JSON-RPC/解析、WebSource 映射、lore_query 四路 fan-out。
 - 视觉：test/vision.test.mjs 覆盖本地图片/frameId/实时参数/semantic OCR/禁用/坏路径；engine/tests/test_vision.py 覆盖合成图构图/UI/map/semantic 和 analyze_image 协议。
 - 帧归档：test/frames.test.mjs 覆盖保存/列表/读取/prune/禁用；真实 e2e 见 scripts/vision-e2e.mjs。
-- 旅途视图：test/journal.test.mjs 覆盖事件分段、人物统计、同场关系与命令契约；AI 整理稿读取 data/journal/curated.json；场次任务映射读取 data/journal/quests.json；真实 DSH 视图渲染仍需人工验收。
+- 旅途视图：test/journal.test.mjs 覆盖事件分段、人物统计、同场关系与命令契约；AI 整理稿读取 data/journal/curated.json；场次任务映射读取 data/journal/quests.json；自动速览由 skills/lore-auto-summary/SKILL.md 描述；真实 DSH 视图渲染仍需人工验收。
 - 后台记录：test/watch.test.mjs 覆盖显式启动、捕获/重复/跳过/空/错误计数、停止、禁用和重复启动；test/watch-remote.test.mjs 覆盖 remote 契约；真实游戏连续记录仍需人工验收。
 - 主界面按钮：client.js 注册 `conversation.session.header.actions`，经 `remote.loreWatch` 执行；`conversation.view` 注册「旅途」，经 `remote.loreJournal` 读取 snapshot；刷新/重启后验收实际渲染。
 - 真实游戏人工验收：两款各切无边框，站到有说话人+正文的对话前；lore_status preview 看裁剪和 OCR；连续记 5–10 句；遮挡测试；10 分钟实录；lore_query 用特征台词找回上下文；lore_narrate 出 brief 并让主模型写解说。
