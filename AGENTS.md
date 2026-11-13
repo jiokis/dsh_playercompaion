@@ -6,13 +6,13 @@
 
 ## 0. 当前阶段
 
-- v0.19.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch、lore_story。
+- v0.20.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch、lore_story。
 - v1 附带 DSH 设置页（client.js）和游戏内 WPF 悬浮窗（overlay/overlay.ps1）。
 - 多源检索：本地日志、BWIKI、虚空终端 Akasha MCP（akasha_search）、DSH ctx.web.search（DeepSeek Search API）。
 - 图像元素分析 v1.3 alpha：本地 `lore_vision` 已实现 composition/ui/map/semantic 启发式（实时窗口、本地图片或归档 frameId）。
 - 本地语义：mode=semantic 用 OCR 文本 + 几何做场景分类、文字块、POI 邻近标签与建议；不调用模型。
 - 帧归档：可选本地 PNG + JSON（默认关闭），`lore_status` 列最近帧，`lore_vision` 可复分析；VLM/语义地图仍在 ROADMAP.md。
-- v0.19.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
+- v0.20.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
 - 主界面：会话标题栏右侧 `conversation.session.header.actions` 注册「开始记录」胶囊；会话顶部新增「旅途」`conversation.view`，显示人物、人物关系、事件梗概和详细对话。
 - 只读；不注入输入、不读游戏内存、不改游戏文件、不抢焦点、不上传截图或日志。远程检索只发 query/world 等必要参数。
 - 需要子智能体时统一用 **dsh-opencode-go / minimax-m3.1-flash**。插件 v1 不内置子智能体或 LLM 调用。
@@ -92,6 +92,7 @@
       lib/overlay-bridge.js 悬浮窗按钮命令：截图/分析/阅读/查找
       lib/journal.js      本地对话聚合成人物/关系/事件/详细对话快照
       lib/quests.js       场次 -> 主线/世界任务/活动 的任务映射
+      lib/speakers.js     OCR 角色名别名、头衔归并与 HUD 噪声规则（journal/story 共用）
       lib/journal-remote.js 旧 Journal remote（保留兼容）
       lib/screenshots.js 截图索引/缩略图/读取/删除
       client.js           DSH 设置页（浏览器半侧，configForms + plugins.bundle.config）
@@ -275,6 +276,7 @@ Python 测试：
 - 多源：test/sources.test.mjs 覆盖 Akasha MCP JSON-RPC/解析、WebSource 映射、lore_query 四路 fan-out。
 - 视觉：test/vision.test.mjs 覆盖本地图片/frameId/实时参数/semantic OCR/禁用/坏路径；engine/tests/test_vision.py 覆盖合成图构图/UI/map/semantic 和 analyze_image 协议。
 - 帧归档：test/frames.test.mjs 覆盖保存/列表/读取/prune/禁用；真实 e2e 见 scripts/vision-e2e.mjs。
+- 说话人合并：test/speakers.test.mjs 覆盖两作别名、子串头衔、HUD 噪声与 journal 一致性；别名只在一处维护。
 - OCR 清洗：test/clean.test.mjs 覆盖水印识别、纯噪声行、省略号保留、换行接合、乱码条与日志读取；读者拿到清洗文本，JSONL 原文件不变。
 - 旅途视图：test/journal.test.mjs 覆盖事件分段、人物统计、同场关系与命令契约；AI 整理稿读取 data/journal/curated.json；场次任务映射读取 data/journal/quests.json；自动速览由 skills/lore-auto-summary/SKILL.md 描述；真实 DSH 视图渲染仍需人工验收。
 - 后台记录：test/watch.test.mjs 覆盖显式启动、捕获/重复/跳过/空/错误计数、停止、禁用和重复启动；test/watch-remote.test.mjs 覆盖 remote 契约；真实游戏连续记录仍需人工验收。
