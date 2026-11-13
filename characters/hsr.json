@@ -1,0 +1,160 @@
+{
+  "game": "hsr",
+  "version": 1,
+  "updatedAt": "2026-11-13",
+  "characters": [
+    {
+      "name": "火花",
+      "aliases": [],
+      "rarity": 5,
+      "element": "火",
+      "path": "欢愉",
+      "note": "二相乐园网络主播「火花花」，与花火几乎同貌，但是另一个角色",
+      "source": "akasha:ingame_zh/09-角色"
+    },
+    {
+      "name": "花火",
+      "aliases": [],
+      "rarity": 5,
+      "element": "量子",
+      "path": "欢愉",
+      "note": "假面愚者，幻月游戏操盘者",
+      "source": "akasha:miyoushe/角色/欢愉"
+    },
+    {
+      "name": "虚照",
+      "aliases": [],
+      "note": "自称阿哈「面具下的人」，幻月游戏导演",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "归寂",
+      "aliases": [
+        "归寂的残渣",
+        "归寂的骰"
+      ],
+      "note": "第五位谒者，净世主",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "阿哈",
+      "aliases": [],
+      "note": "「欢愉」星神",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "真珠",
+      "aliases": [],
+      "note": "公司战略投资部，石心誓环成员",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "绯英",
+      "aliases": [
+        "排英",
+        "继英",
+        "维英"
+      ],
+      "note": "新任无名客，自称绯绯狐",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "飞霄",
+      "aliases": [],
+      "note": "仙舟曜青将军",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "爻光",
+      "aliases": [
+        "交光"
+      ],
+      "note": "帝弓天将，OCR 常作「交光」",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "三月七",
+      "aliases": [
+        "三明七",
+        "兰月七"
+      ],
+      "note": "星穹列车乘员",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "星期日",
+      "aliases": [
+        "星期白",
+        "星期曰",
+        "星期目"
+      ],
+      "note": "匹诺康尼家族长子",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "丹恒",
+      "aliases": [
+        "丹桓"
+      ],
+      "note": "星穹列车乘员",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "姬子",
+      "aliases": [],
+      "note": "星穹列车领航员",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "银狼",
+      "aliases": [],
+      "note": "星核猎手",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "刃",
+      "aliases": [],
+      "note": "星核猎手",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "绘世",
+      "aliases": [],
+      "note": "二相乐园的绘师",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "不死途",
+      "aliases": [],
+      "note": "侦探",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "普狸策",
+      "aliases": [],
+      "note": "狸狸报社编辑",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "朽叶",
+      "aliases": [],
+      "note": "古兽末裔",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "亚婆离",
+      "aliases": [],
+      "note": "技术研发部部长，研究古兽",
+      "source": "log:watch-20261111"
+    },
+    {
+      "name": "屑爷本屑",
+      "aliases": [
+        "肩爷本屑",
+        "肩爷本属"
+      ],
+      "note": "玩家角色（开拓者）的本地昵称",
+      "source": "log:watch-20261111"
+    }
+  ]
+}

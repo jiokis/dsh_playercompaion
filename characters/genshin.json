@@ -1,0 +1,125 @@
+{
+  "game": "genshin",
+  "version": 1,
+  "updatedAt": "2026-11-13",
+  "characters": [
+    {
+      "name": "派蒙",
+      "aliases": [],
+      "note": "旅行者的同伴",
+      "source": "log"
+    },
+    {
+      "name": "纳西妲",
+      "aliases": [
+        "纳西姐"
+      ],
+      "note": "须弥草神",
+      "source": "log"
+    },
+    {
+      "name": "茜特拉莉",
+      "aliases": [
+        "茜特莉",
+        "茜特荘莉",
+        "茜特技莉"
+      ],
+      "source": "log"
+    },
+    {
+      "name": "芙宁娜",
+      "aliases": [],
+      "note": "枫丹前水神",
+      "source": "log"
+    },
+    {
+      "name": "温迪",
+      "aliases": [],
+      "note": "蒙德风神",
+      "source": "log"
+    },
+    {
+      "name": "凝光",
+      "aliases": [],
+      "note": "璃月天权星",
+      "source": "log"
+    },
+    {
+      "name": "雷电将军",
+      "aliases": [
+        "影"
+      ],
+      "note": "稻妻雷神",
+      "source": "log"
+    },
+    {
+      "name": "玛薇卡",
+      "aliases": [],
+      "note": "纳塔火神",
+      "source": "log"
+    },
+    {
+      "name": "温妮莎",
+      "aliases": [],
+      "note": "西风骑士团初代团长",
+      "source": "log"
+    },
+    {
+      "name": "达妮卡",
+      "aliases": [],
+      "note": "至冬运输局调查官",
+      "source": "log:watch-20261110"
+    },
+    {
+      "name": "德罗金",
+      "aliases": [],
+      "note": "至冬调查员",
+      "source": "log:watch-20261110"
+    },
+    {
+      "name": "斯露德",
+      "aliases": [],
+      "note": "矮灵大公阿尔维斯之女",
+      "source": "log:watch-20261105"
+    },
+    {
+      "name": "格林",
+      "aliases": [],
+      "note": "至冬宫派出的水文调查员",
+      "source": "log:watch-20261105"
+    },
+    {
+      "name": "科什金",
+      "aliases": [],
+      "source": "log:watch-20261105"
+    },
+    {
+      "name": "萨杜诺娃",
+      "aliases": [],
+      "source": "log:watch-20261105"
+    },
+    {
+      "name": "伊涅芙",
+      "aliases": [
+        "伊湿芙"
+      ],
+      "source": "log"
+    },
+    {
+      "name": "九条裟罗",
+      "aliases": [
+        "九条装罗"
+      ],
+      "note": "稻妻天领奉行",
+      "source": "log"
+    },
+    {
+      "name": "神里绫华",
+      "aliases": [
+        "神里华"
+      ],
+      "note": "稻妻神里家",
+      "source": "log"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
   "name": "dsh-lore-companion",
-  "version": "0.20.0",
+  "version": "0.21.0",
   "description": "Read-only Genshin Impact / Honkai: Star Rail lore companion for DeepSeek Harness: local screen OCR -> story log -> wiki lookup -> narration material, with a DSH settings page and an in-game overlay.",
   "repository": {
     "type": "git",
@@ -30,7 +30,8 @@
     "icon.png",
     "ROADMAP.md",
     "docs",
-    "skills"
+    "skills",
+    "characters"
   ],
   "scripts": {
     "test": "node --test",

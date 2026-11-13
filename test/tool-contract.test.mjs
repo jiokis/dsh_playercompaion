@@ -40,7 +40,7 @@ const watcher = {
 
 test('tool definitions satisfy the host defineTool contract', () => {
   const tools = [
-    createStatusTool({ config, runtime, logStore, wikiSearch, ctx, overlay, watcher, version: '0.20.0' }),
+    createStatusTool({ config, runtime, logStore, wikiSearch, ctx, overlay, watcher, version: '0.21.0' }),
     createCaptureTool({ config, runtime, logStore, ctx, overlay }),
     createQueryTool({ config, logStore, wikiSearch }),
     createNarrateTool({ config, logStore, wikiSearch }),

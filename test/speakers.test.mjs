@@ -10,8 +10,10 @@ test('genshin OCR variants collapse to one name', () => {
 
 test('star rail OCR variants collapse to one name', () => {
   assert.equal(normalizeSpeaker('肩爷本屑'), '屑爷本屑')
-  assert.equal(normalizeSpeaker('火花'), '花火')
   assert.equal(normalizeSpeaker('排英'), '绯英')
+  // 火花 and 花火 are two different characters; never merge them.
+  assert.equal(normalizeSpeaker('火花'), '火花')
+  assert.equal(normalizeSpeaker('花火'), '花火')
   assert.equal(normalizeSpeaker('星期曰'), '星期日')
   assert.equal(normalizeSpeaker('三明七'), '三月七')
 })

@@ -268,7 +268,7 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - The Journal adds a **Synopsis** tab; data at `<dataDir>/journal/synopsis.json`.
 - Only recorded text is used; OCR-uncertain items are marked.
 
-## 0.20.0 fixes
+## 0.21.0 fixes
 
 - Overlay commands are now BOM-less UTF-8, and Node accepts a BOM too; screenshot/analyze/read/query/force commands are no longer silently dropped.
 - `PUNCT_ONLY`: a silent character showing only an ellipsis is kept even at low OCR confidence.
@@ -281,14 +281,14 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - `text` is plain text ready to send to QQ.
 - The QQ bridge guard (`plugins/qq-agent-presets/qq-tool-restrict.mjs`) allows `lore_story`; restart the bridge or create a new QQ session for the schema to refresh.
 
-## 0.20.0 UI
+## 0.21.0 UI
 
 - Reading-first Journal: hero header, session/time pills, four stat cards, sticky segmented tabs.
 - Synopsis: chapter index, timeline nodes, scene cards, and a jump-to-chapter interaction.
 - Screenshots, event cards, and character cards share the refined gradient/border surface; focus-visible and reduced-motion are respected.
 - In-game overlay: deep-blue gradient, soft border, glowing status dot, and roomier body line height.
 
-## 0.20.0 anchor and memory
+## 0.21.0 anchor and memory
 
 - Collapse/expand keeps the top-right anchor: the ball sits at the panel's top-right and the panel grows left/down; dragging no longer snaps back on the 300ms tick.
 - Low-confidence OCR (<0.62) gets one 1.5x upscaled re-read; the higher-score/more-complete result wins.
@@ -296,7 +296,7 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - `context` returns current scene, recent dialogue, active characters, threads and a guarded companion prompt.
 - Research and roadmap: [docs/REALTIME-COMPANION.md](docs/REALTIME-COMPANION.md).
 
-## 0.20.0 main/world
+## 0.21.0 main/world
 
 - New session map at `<dataDir>/journal/quests.json`: `type=main|world|activity|story`, `name`.
 - Example: [docs/quests.example.json](docs/quests.example.json).
@@ -304,14 +304,14 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - Synopses are bound to a session: a world-quest session no longer inherits the main-story synopsis. A world synopsis must be generated separately.
 - The Journal defaults to the session that has the main synopsis; world sessions remain selectable.
 
-## 0.20.0 auto overview
+## 0.21.0 auto overview
 
 - `lore_story` adds `action=auto`: chunk a whole session, return scenes/characters and an extractive overview without a pre-written synopsis.
 - Works for HSR with `game=hsr`; today's 11/11 session yields ten chunks over 2,419 lines.
 - New [skills/lore-auto-summary/SKILL.md](skills/lore-auto-summary/SKILL.md): auto overview first, optional chunked polish.
 - `lore_story summary game=hsr` reads `<dataDir>/journal/hsr-synopsis.json`.
 
-## 0.20.0 OCR cleanup
+## 0.21.0 OCR cleanup
 
 - New `lib/store/clean.js` cleans OCR noise on read; the JSONL on disk is untouched.
 - Detects the game UID watermark: long digit runs repeated within a session, plus their clipped suffixes, are stripped. In the 11/11 HSR session lines containing 5+ digits dropped from 1,063 to 5.
@@ -319,8 +319,19 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - Subtitle line wraps rejoin without inserting spaces between CJK characters.
 - `lore_story auto` now uses cleaned text: ranges shorten to `11:41–12:22`, scene titles become `speaker · first complete clause`, and repeated or truncated quotes are skipped.
 
-## 0.20.0 speaker merge
+## 0.21.0 speaker merge
 
 - New `lib/speakers.js`: OCR name aliases, decorated titles and HUD noise rules live in one place; `journal.js` and `tools/story.js` no longer keep separate copies.
 - Genshin aliases are unchanged; new HSR variants come from real recordings: `肩爷本屑→屑爷本屑`, `火花→花火`, `排英/继英/维英→绯英`, `星期白/曰/目→星期日`, `三明七/兰月七→三月七`, `丹桓→丹恒`.
 - In the 11/11 HSR session, split records collapse back: `绯英` 47 lines, `花火` 25, `三月七` 42, `屑爷本屑` 112.
+
+## 0.21.0 character roster
+
+- Fixed a wrong merge: **火花 (Sparxie) and 花火 (Sparkle) are different characters**; treating 火花 as an OCR variant of 花火 credited one person's lines to the other.
+- New roster under `characters/genshin.json` and `characters/hsr.json`, shipped with the package and overridable by `<dataDir>/journal/characters.json`.
+- `lib/characters.js` merges seeds and overrides, builds the alias index and refuses to guess: when two characters claim the same spelling it keeps the raw name and reports it via `rosterFacts().ambiguous`.
+- `lore_story` gains `action=profile`: look up a character by name or OCR variant plus its local line count, with suggestions and the file to edit when unknown.
+- Profiles come from the Akasha character documents (only the name is sent) and are cached locally, so lookups work offline.
+- Maintenance:
+  - `node scripts/characters-audit.mjs` lists speakers the roster does not know, ranked by line count.
+  - `node scripts/characters-sync.mjs --game=genshin --limit=10 --min=10` fills gaps from Akasha on demand; it stops on HTTP 429 and skips documents that are not characters.
