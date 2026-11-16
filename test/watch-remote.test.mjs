@@ -21,3 +21,13 @@ test('watch remote command contract', () => {
   assert.throws(() => parseCommand({ action: 'start', mode: 'menu' }), /mode/)
   assert.throws(() => parseCommand(null), /object/)
 })
+
+test('screenshot-thumbs takes a bounded id list', () => {
+  assert.deepEqual(parseCommand({ action: 'screenshot-thumbs', ids: ['shot-a.png', 'shot-b.png'] }), {
+    action: 'screenshot-thumbs',
+    ids: ['shot-a.png', 'shot-b.png']
+  })
+  const many = parseCommand({ action: 'screenshot-thumbs', ids: Array.from({ length: 40 }, (_value, index) => 's' + index + '.png') })
+  assert.equal(many.ids.length, 24)
+  assert.throws(() => parseCommand({ action: 'screenshot-thumbs', ids: 'shot-a.png' }), /array/)
+})

@@ -6,13 +6,13 @@
 
 ## 0. 当前阶段
 
-- v0.21.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch、lore_story。
+- v0.22.0 工具：lore_status、lore_capture、lore_query、lore_narrate、lore_overlay、lore_vision、lore_watch、lore_story。
 - v1 附带 DSH 设置页（client.js）和游戏内 WPF 悬浮窗（overlay/overlay.ps1）。
 - 多源检索：本地日志、BWIKI、虚空终端 Akasha MCP（akasha_search）、DSH ctx.web.search（DeepSeek Search API）。
 - 图像元素分析 v1.3 alpha：本地 `lore_vision` 已实现 composition/ui/map/semantic 启发式（实时窗口、本地图片或归档 frameId）。
 - 本地语义：mode=semantic 用 OCR 文本 + 几何做场景分类、文字块、POI 邻近标签与建议；不调用模型。
 - 帧归档：可选本地 PNG + JSON（默认关闭），`lore_status` 列最近帧，`lore_vision` 可复分析；VLM/语义地图仍在 ROADMAP.md。
-- v0.21.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
+- v0.22.0 后台记录：lore_watch 显式 start/stop/status，复用 capture 管线、去重、本地日志与悬浮窗；不自动启动。
 - 主界面：会话标题栏右侧 `conversation.session.header.actions` 注册「开始记录」胶囊；会话顶部新增「旅途」`conversation.view`，显示人物、人物关系、事件梗概和详细对话。
 - 只读；不注入输入、不读游戏内存、不改游戏文件、不抢焦点、不上传截图或日志。远程检索只发 query/world 等必要参数。
 - 需要子智能体时统一用 **dsh-opencode-go / minimax-m3.1-flash**。插件 v1 不内置子智能体或 LLM 调用。
@@ -65,6 +65,7 @@
 - Akasha MCP：`https://agent.zlb.ink/api/mcp/`（streamable-http，JSON-RPC；initialize + tools/call）。
 - DSH Web Search：通过 `ctx.web.search({query,maxResults,signal})`，provider 由部署的 `deepseek-search-api` 选择；不要读凭据或绕过 provider。
 - 悬浮窗 state/log：<dataDir>/overlay/state.json、overlay.log。
+- 宿主兼容：`lib/compat.js` 负责版本探测（已测 `>=0.2.1-rc.2 <0.4.0`）与能力探测；可选能力缺失只降级不抛错。
 - DSH 客户端半侧：client.js（手写 ModuleLoader bundle）+ locale/*.json；Config 必须 .volatile() 才能被 configForms 编辑。
 - 插件源码：D:/path/to/dsh-lore-companion；插件包名：dsh-lore-companion。
 
@@ -94,8 +95,9 @@
       lib/quests.js       场次 -> 主线/世界任务/活动 的任务映射
       lib/speakers.js     OCR 角色名别名、头衔归并与 HUD 噪声规则（journal/story 共用）
       lib/characters.js   角色资料库：种子 + 用户覆盖、别名索引、歧义保护、profile 查询
+      lib/compat.js       宿主版本/能力探测、工具注册兜底（未来 DSH 版本只改这里）
       lib/journal-remote.js 旧 Journal remote（保留兼容）
-      lib/screenshots.js 截图索引/缩略图/读取/删除
+      lib/screenshots.js 截图索引：哈希去重、按场次过滤、汇总与保留策略
       client.js           DSH 设置页（浏览器半侧，configForms + plugins.bundle.config）
       overlay/overlay.ps1 WPF 置顶/可拖动/可折叠悬浮窗，轮询 state.json，按钮写 command.json
               |
@@ -131,7 +133,7 @@
 ### lore_status
 
 - 参数：preview?、game?（auto/genshin/hsr）、window?。
-- 返回：plugin/version/platform、engine 状态、dataDir、games、ocr、wiki、sessions、overlay、sources（akasha/web 可用性）、frames（最近归档）、watch（后台状态）、preview、previewError、attachment、warnings。
+- 返回：plugin/version/platform、engine 状态、dataDir、games、ocr、wiki、sessions、overlay、sources（akasha/web 可用性）、frames（最近归档）、watch（后台状态）、compat（宿主版本/能力/缺失项）、screenshots（总数/体积/时间跨度）、preview、previewError、attachment、warnings。
 - preview=true 抓一帧、跑区域检测和 OCR、返回裁剪图附件；不写日志。
 - 引擎 installing/failed 作为正常状态返回，不抛异常。
 
@@ -274,7 +276,8 @@ Python 测试：
 - 工具契约：用宿主同版本 @deepseek-ai/dsh-tools 的 defineTool 校验 schema/output/render。
 - 只读静态检查：扫描 engine/lore_engine 和 lib，禁止输入/内存/焦点 API（GetForegroundWindow 允许）。
 - 客户端：test/client.test.mjs 用假 ModuleLoader 验证 `plugins.bundle.config` 注册、locale 与 configForms 命名空间。
-- 悬浮窗：test/overlay.test.mjs 验证 state/status/缺脚本错误；test/overlay-bridge.test.mjs 验证截图/阅读/强制记录；test/screenshots.test.mjs 验证截图索引、缩略图、读取、删除。
+- 悬浮窗：test/overlay.test.mjs 验证 state/status/缺脚本错误；test/overlay-bridge.test.mjs 验证截图/阅读/强制记录；test/screenshots.test.mjs 验证截图索引、缩略图、读取、删除、哈希去重、场次过滤、汇总与保留。
+- 宿主兼容：test/compat.test.mjs 验证版本解析/比较、已测/更新/更旧三种状态、可选能力缺失降级、注册失败兜底与工具 spec 归一化。
 - 多源：test/sources.test.mjs 覆盖 Akasha MCP JSON-RPC/解析、WebSource 映射、lore_query 四路 fan-out。
 - 视觉：test/vision.test.mjs 覆盖本地图片/frameId/实时参数/semantic OCR/禁用/坏路径；engine/tests/test_vision.py 覆盖合成图构图/UI/map/semantic 和 analyze_image 协议。
 - 帧归档：test/frames.test.mjs 覆盖保存/列表/读取/prune/禁用；真实 e2e 见 scripts/vision-e2e.mjs。

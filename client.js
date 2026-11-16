@@ -659,6 +659,13 @@ window.__ModuleLoader__.load({
       } catch (error) { return ""; }
     }
 
+    function fmtBytes(value) {
+      var bytes = Number(value) || 0;
+      if (bytes < 1024) return bytes + " B";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+      return (bytes / 1024 / 1024).toFixed(1) + " MB";
+    }
+
     function speakerColor(name) {
       var hash = 0;
       var text = String(name || "旁白");
@@ -750,6 +757,9 @@ window.__ModuleLoader__.load({
       var limitHook = react.useState(300);
       var limit = limitHook[0];
       var setLimit = limitHook[1];
+      var thumbHook = react.useState({});
+      var shotThumbs = thumbHook[0];
+      var setShotThumbs = thumbHook[1];
 
       var load = function (nextGame, nextSession, nextLimit) {
         var wanted = Number(nextLimit) || limit || 300;
@@ -789,6 +799,23 @@ window.__ModuleLoader__.load({
       react.useEffect(function () {
         load("genshin", "", 300);
       }, []);
+
+      // Thumbnails are not part of the snapshot; fetch the visible ones once.
+      react.useEffect(function () {
+        if (tab !== "screenshots" || !snapshot) return;
+        var shots = snapshot.screenshots || [];
+        var missing = shots.map(function (shot) { return shot.id; }).filter(function (id) { return id && !shotThumbs[id]; });
+        if (!missing.length) return;
+        invoke({ action: "screenshot-thumbs", ids: missing.slice(0, 24) }).then(function (result) {
+          var thumbs = result && result.thumbs ? result.thumbs : [];
+          if (!thumbs.length) return;
+          setShotThumbs(function (previous) {
+            var next = Object.assign({}, previous);
+            thumbs.forEach(function (item) { if (item && item.id) next[item.id] = item.thumb; });
+            return next;
+          });
+        }).catch(function () { /* thumbnails are best effort */ });
+      }, [tab, snapshot]);
 
       var gameLabel = { genshin: "原神", hsr: "星穹铁道" };
       var gameSelect = h("select", {
@@ -1061,9 +1088,9 @@ window.__ModuleLoader__.load({
       var screenshotCards = shots.length ? h("div", { className: "lc-j-shot-grid" }, shots.map(function (shot) {
         return h("div", { className: "lc-j-shot", key: shot.id },
           h("button", { className: "lc-j-shot-img", type: "button", onClick: function () { openShot(shot.id); } },
-            shot.thumb
-              ? h("img", { src: shot.thumb, alt: shot.speaker || "游戏截图", loading: "lazy" })
-              : h("span", { className: "lc-j-shot-placeholder" }, "无缩略图")
+            shotThumbs[shot.id] || shot.thumb
+              ? h("img", { src: shotThumbs[shot.id] || shot.thumb, alt: shot.speaker || "游戏截图", loading: "lazy" })
+              : h("span", { className: "lc-j-shot-placeholder" }, "缩略图加载中")
           ),
           h("div", { className: "lc-j-shot-meta" },
             h("b", null, shot.speaker || "截图"),
@@ -1169,9 +1196,13 @@ window.__ModuleLoader__.load({
         })
       ) : h("div", { className: "lc-j-empty" }, "还没有 AI 整理稿。生成 data/journal/curated.json 后会出现在这里。");
 
+      var shotSummary = snapshot && snapshot.screenshotSummary ? snapshot.screenshotSummary : null;
+      var shotSummaryText = shotSummary && shotSummary.total
+        ? shotSummary.total + " 张截图 · " + fmtBytes(shotSummary.bytes) + (shotSummary.firstTs ? " · " + fmtDay(shotSummary.firstTs) + " " + fmtClock(shotSummary.firstTs) : "")
+        : "本场没有截图";
       var screenshotView = h("div", null,
         h("div", { className: "lc-j-tools" },
-          h("span", { className: "lc-j-sub" }, shots.length + " 张本地截图 · 点击查看原图"),
+          h("span", { className: "lc-j-sub" }, shotSummaryText + " · 点击查看原图"),
           h("button", { className: "lc-j-btn", type: "button", onClick: function () { load(game, snapshot ? snapshot.session : "", limit); } }, "刷新截图")
         ),
         screenshotCards
