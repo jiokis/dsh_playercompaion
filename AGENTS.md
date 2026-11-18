@@ -66,6 +66,8 @@
 - DSH Web Search：通过 `ctx.web.search({query,maxResults,signal})`，provider 由部署的 `deepseek-search-api` 选择；不要读凭据或绕过 provider。
 - 悬浮窗 state/log：<dataDir>/overlay/state.json、overlay.log。
 - 宿主兼容：`lib/compat.js` 负责版本探测（已测 `>=0.2.1-rc.2 <0.4.0`）与能力探测；可选能力缺失只降级不抛错。
+- package.json 的 `engines.dsh` 与 `dsh.compatibility.dsh` 必须保持 `*`：semver 下带边界的范围会静默排除预发布宿主（0.2.2-rc.3），版本判断只在运行时做。
+- 插件能否加载用 `node scripts/selfcheck.mjs` 复跑：严格 proxy ctx 下 apply，打印工具列表、能力探测与数据目录。
 - DSH 客户端半侧：client.js（手写 ModuleLoader bundle）+ locale/*.json；Config 必须 .volatile() 才能被 configForms 编辑。
 - 插件源码：D:/path/to/dsh-lore-companion；插件包名：dsh-lore-companion。
 

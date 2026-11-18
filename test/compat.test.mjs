@@ -60,8 +60,44 @@ test('tool registration survives a broken host register', () => {
   assert.ok(throwing[0].includes('failed to register'))
 })
 
-test('tool specs get the fields the host expects', () => {
-  const spec = normalizeToolSpec({ name: 'x' })
-  assert.equal(spec.description, 'x')
-  assert.deepEqual(spec.input, { type: 'object', properties: {} })
+test('tool specs are passed through untouched when complete', () => {
+  const original = { name: 'x', description: 'd', parameters: { a: 1 }, execute: () => {} }
+  assert.equal(normalizeToolSpec(original), original)
+  // A missing description is filled, but no unknown keys are added: the host
+  // rejects a registered tool whose shape it does not recognise.
+  const filled = normalizeToolSpec({ name: 'x' })
+  assert.equal(filled.description, 'x')
+  assert.deepEqual(Object.keys(filled).sort(), ['description', 'name'])
+})
+
+test('the declared dsh range cannot gate out a prerelease host', async () => {
+  // semver only lets a prerelease satisfy a range that names the same
+  // major.minor.patch, so any bounded range silently rejects hosts like
+  // 0.2.2-rc.3. Compatibility is decided at runtime by lib/compat.js instead.
+  const { readFileSync } = await import('node:fs')
+  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
+  assert.equal(pkg.dsh.compatibility.dsh, '*')
+  assert.equal(pkg.engines.dsh, '*')
+})
+
+test('lib avoids APIs that need a newer Node than the desktop host', async () => {
+  const { readdirSync, readFileSync, statSync } = await import('node:fs')
+  const { join } = await import('node:path')
+  const root = new URL('../lib/', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')
+  const offenders = []
+  const walk = (dir) => {
+    for (const name of readdirSync(dir)) {
+      const path = join(dir, name)
+      if (statSync(path).isDirectory()) {
+        walk(path)
+        continue
+      }
+      if (!name.endsWith('.js')) continue
+      const source = readFileSync(path, 'utf8')
+      // import.meta.dirname landed in Node 20.11; Electron hosts can be older.
+      if (source.includes('import.meta.dirname') || source.includes('import.meta.filename')) offenders.push(path)
+    }
+  }
+  walk(root)
+  assert.deepEqual(offenders, [])
 })

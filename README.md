@@ -353,3 +353,22 @@ A Journal view sits next to Chat / Trace in a DSH session:
 - `ScreenshotStore.summary()` returns totals, bytes, per-game/per-session counts, the time span and the latest six; both `lore_status` and the journey page use it.
 - Journey snapshots now scope screenshots to the selected session and carry metadata only; thumbnails load on demand through `screenshot-thumbs` instead of shipping twelve base64 images per snapshot.
 - The screenshot tab header shows "N shots · size · first capture", with a "loading thumbnail" placeholder until thumbs arrive.
+
+## 0.23.0 startup fix
+
+### Symptom
+
+After DSH moved to 0.2.2-rc.3 the plugin stopped loading: the journey tab was there, "start recording" did nothing, and all eight lore_* tools disappeared.
+
+### Root cause
+
+`package.json` declared the host range as `>=0.2.1-rc.2 <0.3.0`. By semver rule 11 a prerelease version only satisfies a range that contains a prerelease comparator with the **same** major.minor.patch. Only 0.2.1 carried a prerelease there, so `0.2.2-rc.3` was treated as out of range — a host update locked the plugin out even though no plugin code was wrong.
+
+### Changes
+
+- `engines.dsh` and `dsh.compatibility.dsh` are now `*`: version gating moved to runtime.
+- `lib/compat.js` reports `tested / newer-than-tested / older-than-tested`; a newer host warns instead of blocking.
+- Optional subsystems inside `apply()` are isolated: remote service, overlay bridge, engine bootstrap and roster load each fail as a warning, and all eight tools still register.
+- New `scripts/selfcheck.mjs` proves the plugin loads without starting the GUI:
+
+      node scripts/selfcheck.mjs
